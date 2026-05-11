@@ -1,14 +1,38 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Tokenizer {
+
+     public static final Set<String> KEYWORDS =
+        new HashSet<>(Arrays.asList(
+            "Rune", //int
+            "Chant", //while
+            "Glyph", //double
+            "Cast", // print
+            "Ward", //if
+            "else",
+            "Spell", //String
+            "Channel", //for
+            "Sigil", //boolean
+            "True",
+            "False"
+        ));
 
     List<Token> tokens = new ArrayList<>();
 
     int state = 0;
     int delta = 0;
+
+    String source;
+
+    // l = lexeme start
     int l = 0;
+
+    // current = current character
     int current = 0;
 
     AsTable asTable = new AsTable();
@@ -49,76 +73,177 @@ public class Tokenizer {
     };
 
     public Tokenizer(String source) throws IOException {
+            this.source = source;
+            int[] Ascii = asTable.getAsTable();
+            while (current < source.length()) {
+                char ch = source.charAt(current);
+                delta = DFA[state][Ascii[ch]];
 
-        int ch;
-        int[] Ascii = asTable.getAsTable();
+        if(state == 0 && delta == 0) {
 
-        while (current < source.length()) {
+            current++;
+            l = current;
+            continue;
+        }
 
-            ch = source.charAt(current);
-
-            delta = DFA[state][Ascii[ch]];
-
-            if (delta > 0) {
-                state = delta;
-            }
-            else if (delta < 0) {
-
-                tokens.add(new Token(
-                        this.getTokenType(delta),
-                        source.substring(l, current)
-                ));
-
-                state = 0;
-                l = current;
-            }
-
+        if(delta >= 0) {
+            state = delta;
             current++;
         }
 
-        System.out.println(tokens);
+        else {
+            String lexeme;
+            if(needsRetract(delta)) {
+                lexeme = source.substring(l, current);
+            }
+            else {
+                lexeme = source.substring(l, current + 1);
+                current++;
+            }
+
+            Token token = TokenAdder(delta, lexeme);
+
+            if(token != null) {
+                tokens.add(token);
+            }
+
+            state = 0;
+            l = current;
+        }
+    }       
+            if (state == 1) {
+                tokens.add(TokenAdder(-1, source.substring(l, current)));
+            }
+            else if (state == 2) {
+                tokens.add(TokenAdder(-2, source.substring(l, current)));
+            }
+            else if (state == 3) {
+                tokens.add(TokenAdder(-3, source.substring(l, current)));
+            }
+
+            System.out.println(tokens);
     }
 
-    public TokenType getTokenType(int delta) {
+    private boolean needsRetract(int delta) {
 
-        switch (delta) {
+        switch(delta) {
 
-            case -1: return TokenType.IDENTIFIER;
-            case -2: return TokenType.INTEGER;
-            case -3: return TokenType.DOUBLE;
-            case -4: return TokenType.LESS_THAN;
-            case -5: return TokenType.SEMICOLON;
-            case -6: return TokenType.LESS_EQUAL;
-            case -7: return TokenType.GREATER_THAN;
-            case -8: return TokenType.GREATER_EQUAL;
-            case -9: return TokenType.EQUALS;
-            case -10: return TokenType.EQUALS_EQUALS;
-            case -11: return TokenType.STRING;
-            case -12: return TokenType.LEFT_PAREN;
-            case -13: return TokenType.RIGHT_PAREN;
-            case -14: return TokenType.LEFT_BRACE;
-            case -15: return TokenType.RIGHT_BRACE;
-            case -16: return TokenType.PLUS;
-            case -17: return TokenType.MINUS;
-            case -18: return TokenType.DOT;
-            case -19: return TokenType.AMPERSAND;
-            case -20: return TokenType.AMPAMP;
-            case -21: return TokenType.VERTBAR;
-            case -22: return TokenType.VERTBARBAR;
-            case -23: return TokenType.NOT;
-            case -24: return TokenType.MULTIPLY;
-            case -25: return TokenType.COMMA;
-            case -26: return TokenType.DIVIDE;
-            case -27: return TokenType.NOT_EQUAL;
-            case -28: return TokenType.MINUS_MINUS;
-            case -29: return TokenType.PLUS_PLUS;
-            case -30: return TokenType.MODULO;
-
-            case -99:
-                throw new RuntimeException("Invalid character");
-
-            default:
-                throw new RuntimeException("Unknown delta: " + delta);
+            case -1:
+            case -2:
+            case -3:
+            case -4:
+            case -7:
+            case -9:
+            case -16:
+            case -17:
+            case -18:
+            case -19:
+            case -21:
+            case -23:
+                return true;
         }
+
+        return false;
+    }
+
+    private Token TokenAdder(int delta, String lexeme) {
+
+        switch(delta) {
+
+    case -1:
+        return new Token(TokenType.IDENTIFIER, lexeme);
+
+    case -2:
+        return new Token(TokenType.INTEGER, Integer.parseInt(lexeme));
+
+    case -3:
+        return new Token(TokenType.DOUBLE, Double.parseDouble(lexeme));
+
+    case -4:
+        return new Token(TokenType.LESS_THAN, lexeme);
+
+    case -5:
+        return new Token(TokenType.SEMICOLON, lexeme);
+
+    case -6:
+        return new Token(TokenType.LESS_EQUAL, lexeme);
+
+    case -7:
+        return new Token(TokenType.GREATER_THAN, lexeme);
+
+    case -8:
+        return new Token(TokenType.GREATER_EQUAL, lexeme);
+
+    case -9:
+        return new Token(TokenType.EQUALS, lexeme);
+
+    case -10:
+        return new Token(TokenType.EQUALS_EQUALS, lexeme);
+
+    case -11:
+        return new Token(TokenType.STRING, lexeme);
+
+    case -12:
+        return new Token(TokenType.LEFT_PAREN, lexeme);
+
+    case -13:
+        return new Token(TokenType.RIGHT_PAREN, lexeme);
+
+    case -14:
+        return new Token(TokenType.LEFT_BRACE, lexeme);
+
+    case -15:
+        return new Token(TokenType.RIGHT_BRACE, lexeme);
+
+    case -16:
+        return new Token(TokenType.PLUS, lexeme);
+
+    case -17:
+        return new Token(TokenType.MINUS, lexeme);
+
+    case -18:
+        return new Token(TokenType.DOT, lexeme);
+
+    case -19:
+        return new Token(TokenType.AMPERSAND, lexeme);
+
+    case -20:
+        return new Token(TokenType.AMPAMP, lexeme);
+
+    case -21:
+        return new Token(TokenType.VERTBAR, lexeme);
+
+    case -22:
+        return new Token(TokenType.VERTBARBAR, lexeme);
+
+    case -23:
+        return new Token(TokenType.NOT, lexeme);
+
+    case -24:
+        return new Token(TokenType.MULTIPLY, lexeme);
+
+    case -25:
+        return new Token(TokenType.COMMA, lexeme);
+
+    case -26:
+        return new Token(TokenType.DIVIDE, lexeme);
+
+    case -27:
+        return new Token(TokenType.NOT_EQUAL, lexeme);
+
+    case -28:
+        return new Token(TokenType.MINUS_MINUS, lexeme);
+
+    case -29:
+        return new Token(TokenType.PLUS_PLUS, lexeme);
+
+    case -30:
+        return new Token(TokenType.MODULO, lexeme);
+
+    case -99:
+        throw new RuntimeException("Invalid character: " + lexeme);
+}
+
+        return null;
     }
 }
