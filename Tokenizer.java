@@ -151,13 +151,16 @@ public class Tokenizer {
         switch(delta) {
 
     case -1:
+        if(KEYWORDS.contains(lexeme)) {
+            return new Token(TokenType.KEYWORD, lexeme);
+        }
         return new Token(TokenType.IDENTIFIER, lexeme);
 
     case -2:
-        return new Token(TokenType.INTEGER, Integer.parseInt(lexeme));
+        return new Token(TokenType.INTEGER, lexeme);
 
     case -3:
-        return new Token(TokenType.DOUBLE, Double.parseDouble(lexeme));
+        return new Token(TokenType.DOUBLE, lexeme);
 
     case -4:
         return new Token(TokenType.LESS_THAN, lexeme);

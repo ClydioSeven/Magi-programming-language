@@ -44,6 +44,9 @@ public class Token {
             case STRING ->
                 "[STRING: " + value + "]";
 
+            case KEYWORD ->
+                "[KEYWORD: " + value + "]";
+
             default ->
                 "[" + type + "]";
         };
