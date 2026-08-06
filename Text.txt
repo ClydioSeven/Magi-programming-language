@@ -1,1 +1,2 @@
-Rune x=0;
+Fireball = "Fireball";
+Cast("Fireball");
