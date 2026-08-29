@@ -1,2 +1,2 @@
-Fireball = "Fireball";
-Cast("Fireball");
+Rune x = 5;
+x++;

@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-//javac Main.java AsTable.java Tokenizer.java Token.java TokenType.java ReservedWords.java
+//javac Main.java AsTable.java Tokenizer.java Token.java TokenType.java 
 public class Main {
     public static void main(String[] args) {
         if (args.length == 0) {

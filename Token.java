@@ -9,12 +9,12 @@ public class Token {
         this.value = value;
     }
 
-    // Integer constructor
+    
     public Token(TokenType type, int value) {
         this(type, String.valueOf(value));
     }
 
-    // Double constructor
+    
     public Token(TokenType type, double value) {
         this(type, String.valueOf(value));
     }
@@ -43,9 +43,6 @@ public class Token {
 
             case STRING ->
                 "[STRING: " + value + "]";
-
-            case KEYWORD ->
-                "[KEYWORD: " + value + "]";
 
             default ->
                 "[" + type + "]";

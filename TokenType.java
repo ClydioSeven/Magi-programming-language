@@ -1,5 +1,18 @@
 enum TokenType {
-    KEYWORD,
+     // Keywords
+    RUNE,
+    CHANT,
+    GLYPH,
+    CAST,
+    WARD,
+    ELSE,
+    SPELL,
+    CHANNEL,
+    SIGIL,
+    TRUE,
+    FALSE,
+
+    //Rest
     IDENTIFIER,
     INTEGER,
     DOUBLE,

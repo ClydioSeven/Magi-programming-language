@@ -16,7 +16,7 @@ public class Tokenizer {
             "Ward", //if
             "else",
             "Spell", //String
-            "Channel", //for
+            "Barrage", //for
             "Sigil", //boolean
             "True",
             "False"
@@ -151,11 +151,42 @@ public class Tokenizer {
         switch(delta) {
 
     case -1:
-        if(KEYWORDS.contains(lexeme)) {
-            return new Token(TokenType.KEYWORD, lexeme);
-        }
-        return new Token(TokenType.IDENTIFIER, lexeme);
+        switch (lexeme) {
+            case "Rune":
+                return new Token(TokenType.RUNE, lexeme);
 
+            case "Chant":
+                return new Token(TokenType.CHANT, lexeme);
+
+            case "Glyph":
+                return new Token(TokenType.GLYPH, lexeme);
+
+            case "Cast":
+                return new Token(TokenType.CAST, lexeme);
+
+            case "Ward":
+                return new Token(TokenType.WARD, lexeme);
+
+            case "else":
+                return new Token(TokenType.ELSE, lexeme);
+
+            case "Spell":
+                return new Token(TokenType.SPELL, lexeme);
+
+            case "Channel":
+                return new Token(TokenType.CHANNEL, lexeme);
+
+            case "Sigil":
+                return new Token(TokenType.SIGIL, lexeme);
+
+            case "True":
+                return new Token(TokenType.TRUE, lexeme);
+
+            case "False":
+                return new Token(TokenType.FALSE, lexeme);
+            default:
+                return new Token(TokenType.IDENTIFIER, lexeme);
+        }
     case -2:
         return new Token(TokenType.INTEGER, lexeme);
 
