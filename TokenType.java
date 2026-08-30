@@ -7,7 +7,7 @@ enum TokenType {
     WARD,
     ELSE,
     SPELL,
-    CHANNEL,
+    BARRAGE ,
     SIGIL,
     TRUE,
     FALSE,

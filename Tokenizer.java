@@ -173,8 +173,8 @@ public class Tokenizer {
             case "Spell":
                 return new Token(TokenType.SPELL, lexeme);
 
-            case "Channel":
-                return new Token(TokenType.CHANNEL, lexeme);
+            case "Barrage":
+                return new Token(TokenType.BARRAGE, lexeme);
 
             case "Sigil":
                 return new Token(TokenType.SIGIL, lexeme);
@@ -279,5 +279,9 @@ public class Tokenizer {
 }
 
         return null;
+    }
+
+    public List<Token> getTokens() {
+        return tokens;  
     }
 }

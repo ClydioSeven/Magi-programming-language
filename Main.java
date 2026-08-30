@@ -20,6 +20,7 @@ public class Main {
         .replace("\r", "\n");
 
         Tokenizer tokenizer = new Tokenizer(source);
+        Parser parser = new Parser(tokenizer.getTokens());
 } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
