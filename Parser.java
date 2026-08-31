@@ -143,8 +143,41 @@ public class Parser {
     }
 
     private Statement parseFor() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'parseFor'");
+        consume(TokenType.BARRAGE);
+        consume(TokenType.LEFT_PAREN);
+        Token next = peek();
+        Statement initialization;
+        switch(next.getType()){
+            case RUNE:
+                consume(TokenType.RUNE);
+                Token identifier = consume(TokenType.IDENTIFIER);
+                consume(TokenType.EQUALS);
+                Token number = consume(TokenType.INTEGER);
+                initialization = new IntCreateNode(
+                    identifier.getValue(),
+                    new IntLiteralNode(
+                        Integer.parseInt(number.getValue())
+                    )
+                );
+                break;
+            case GLYPH:
+                consume(TokenType.GLYPH);
+                Token identifier2 = consume(TokenType.IDENTIFIER);
+                consume(TokenType.EQUALS);
+                Token number2 = consume(TokenType.DOUBLE);
+                initialization = new DoubleCreateNode(
+                    identifier2.getValue(),
+                    new DoubleLiteralNode(
+                        Double.parseDouble(number2.getValue())
+                    )
+                );
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected value: " + next.getType());
+        }
+        consume(TokenType.SEMICOLON);
+        
+
     }
 
     private Statement parseIf() {
@@ -175,12 +208,8 @@ public class Parser {
     private Statement parseDoubleDeclaration() {
         consume(TokenType.GLYPH);
         Token identifier = consume(TokenType.IDENTIFIER);
-
         consume(TokenType.EQUALS);
-
-        Token number =
-        consume(TokenType.DOUBLE);
-
+        Token number = consume(TokenType.DOUBLE);
         consume(TokenType.SEMICOLON);
 
         return new DoubleCreateNode(
