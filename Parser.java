@@ -10,12 +10,18 @@ public class Parser {
     }
 
     private Token peek() {
-        return tokens.get(current);
-    }
+        if (isAtEnd()) {
+            throw new RuntimeException("Unexpected end of program.");
+        }
+    return tokens.get(current);
+}
 
     private Token peek(int distance) {
-        return tokens.get(current + distance);
+    if (current + distance >= tokens.size()) {
+        throw new RuntimeException("Unexpected end of program.");
     }
+    return tokens.get(current + distance);
+}
 
     private Token consume(TokenType expected) {
         if (current >= tokens.size()) {
