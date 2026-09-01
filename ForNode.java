@@ -1,8 +1,5 @@
 import java.util.List;
 
-/**
- * ForNode
- */
 public class ForNode implements Statement {
     private final Statement initialization;
     private final Expression condition;

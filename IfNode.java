@@ -1,8 +1,5 @@
 import java.util.List;
 
-/**
- * IfNode
- */
 public class IfNode implements Statement {
     private final Expression condition;
     private final List<Statement> thenBranch;

@@ -1,7 +1,5 @@
-/**
- * StringLiteralNode
- */
-public class StringLiteralNode {
+
+public class StringLiteralNode implements Expression {
 
     public StringLiteralNode(String value) {
     }

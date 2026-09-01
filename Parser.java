@@ -156,39 +156,11 @@ public class Parser {
         consume(TokenType.BARRAGE);
         consume(TokenType.LEFT_PAREN);
         Token next = peek();
-        Statement initialization;
-        switch(next.getType()){
-            case RUNE:
-                consume(TokenType.RUNE);
-                Token identifier = consume(TokenType.IDENTIFIER);
-                consume(TokenType.EQUALS);
-                Token number = consume(TokenType.INTEGER);
-                initialization = new IntCreateNode(
-                    identifier.getValue(),
-                    new IntLiteralNode(
-                        Integer.parseInt(number.getValue())
-                    )
-                );
-                break;
-            case GLYPH:
-                consume(TokenType.GLYPH);
-                Token identifier2 = consume(TokenType.IDENTIFIER);
-                consume(TokenType.EQUALS);
-                Token number2 = consume(TokenType.DOUBLE);
-                initialization = new DoubleCreateNode(
-                    identifier2.getValue(),
-                    new DoubleLiteralNode(
-                        Double.parseDouble(number2.getValue())
-                    )
-                );
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected value: " + next.getType());
-        }
+        Statement initialization = parseStatement();
         consume(TokenType.SEMICOLON);
         Expression condition = parseExpression();
         consume(TokenType.SEMICOLON);
-        Statement increment = parseIdentifierStatement();
+        //Increment/Decrement or Expression
         consume(TokenType.RIGHT_PAREN);
         consume(TokenType.LEFT_BRACE);
         List<Statement> body = new ArrayList<>();

@@ -1,1 +1,1 @@
-Spell Fireball = "Fireball";
+x ! y;
