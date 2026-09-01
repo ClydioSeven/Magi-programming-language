@@ -148,7 +148,9 @@ public class Parser {
     }
 
     private Expression parseExpression() {
-        // TODO Auto-generated method stub
+        
+        
+
         throw new UnsupportedOperationException("Unimplemented method 'parseExpression'");
     }
 
@@ -168,6 +170,8 @@ public class Parser {
             body.add(parseStatement());
         }
         consume(TokenType.RIGHT_BRACE);
+        //Remove later 
+        Statement increment = parseIdentifierStatement();
         return new ForNode(initialization, condition, increment, body);
 
 
