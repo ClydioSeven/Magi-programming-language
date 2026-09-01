@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -176,13 +177,34 @@ public class Parser {
                 throw new IllegalArgumentException("Unexpected value: " + next.getType());
         }
         consume(TokenType.SEMICOLON);
-        
+        Expression condition = parseExpression();
+        consume(TokenType.SEMICOLON);
+        Statement increment = parseIdentifierStatement();
+        consume(TokenType.RIGHT_PAREN);
+        consume(TokenType.LEFT_BRACE);
+        List<Statement> body = new ArrayList<>();
+        while (peek().getType() != TokenType.RIGHT_BRACE) {
+            body.add(parseStatement());
+        }
+        consume(TokenType.RIGHT_BRACE);
+        return new ForNode(initialization, condition, increment, body);
+
 
     }
 
     private Statement parseIf() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'parseIf'");
+        consume(TokenType.WARD);
+        consume(TokenType.LEFT_PAREN);
+        Expression condition = parseExpression();
+        consume(TokenType.RIGHT_PAREN);
+        consume(TokenType.LEFT_BRACE);
+        List<Statement> thenBranch = new ArrayList<>();
+        List<Statement> elseBranch = new ArrayList<>();
+        while ((peek().getType() != (TokenType.RIGHT_BRACE ))&& (peek().getType() != (TokenType.ELSE))) {
+            thenBranch.add(parseStatement());
+        }
+        consume(TokenType.RIGHT_BRACE);
+        return new IfNode(condition, thenBranch,elseBranch);
     }
 
     private Statement parseWhile() {
