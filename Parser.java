@@ -200,20 +200,50 @@ public class Parser {
         consume(TokenType.LEFT_BRACE);
         List<Statement> thenBranch = new ArrayList<>();
         List<Statement> elseBranch = new ArrayList<>();
-        while ((peek().getType() != (TokenType.RIGHT_BRACE ))&& (peek().getType() != (TokenType.ELSE))) {
+        while (peek().getType() != TokenType.RIGHT_BRACE) {
+        
             thenBranch.add(parseStatement());
         }
         consume(TokenType.RIGHT_BRACE);
-        return new IfNode(condition, thenBranch,elseBranch);
+        if (peek().getType() == TokenType.ELSE) {
+            consume(TokenType.ELSE);
+            if(peek().getType() == TokenType.WARD){
+                consume(TokenType.WARD);
+                consume(TokenType.LEFT_BRACE);
+                while (peek().getType() != TokenType.RIGHT_BRACE) {
+                    elseBranch.add(parseStatement());
+                }
+                consume(TokenType.RIGHT_BRACE);
+            }else if(peek().getType() == TokenType.LEFT_BRACE){
+                consume(TokenType.LEFT_BRACE);
+                while (peek().getType() != TokenType.RIGHT_BRACE) {
+                    elseBranch.add(parseStatement());
+                }
+                consume(TokenType.RIGHT_BRACE);
+            }
+        }
+        return new IfNode(condition,thenBranch,elseBranch);
     }
 
     private Statement parseWhile() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'parseWhile'");
+        consume(TokenType.CHANT);
+        consume(TokenType.LEFT_PAREN);
+        Expression condition = parseExpression();
+        consume(TokenType.RIGHT_PAREN);
+        consume(TokenType.LEFT_BRACE);
+        List<Statement> body = new ArrayList<>();
+        while (peek().getType() != TokenType.RIGHT_BRACE) {
+            body.add(parseStatement());
+        }
+        consume(TokenType.RIGHT_BRACE);
+        return new WhileNode(condition, body);
     }
 
     private Statement parsePrint() {
-        // TODO Auto-generated method stub
+        consume(TokenType.CAST);
+        consume(TokenType.LEFT_PAREN);
+        
+        consume(TokenType.RIGHT_PAREN);
         throw new UnsupportedOperationException("Unimplemented method 'parsePrint'");
     }
 
@@ -223,8 +253,15 @@ public class Parser {
     }
 
     private Statement parseStringDeclaration() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'parseStringDeclaration'");
+        consume(TokenType.SPELL);
+        Token identifier = consume(TokenType.IDENTIFIER);
+        consume(TokenType.EQUALS);
+        Token string = consume(TokenType.STRING);
+        consume(TokenType.SEMICOLON);
+        return new StringCreateNode(
+            identifier.getValue(),
+            new StringLiteralNode(string.getValue())
+        );
     }
 
     private Statement parseDoubleDeclaration() {
