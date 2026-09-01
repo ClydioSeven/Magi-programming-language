@@ -30,10 +30,13 @@ public class Parser {
         current++;
         return token;
     }
+    private boolean isAtEnd() {
+        return current >= tokens.size();
+    }
 
     public ProgramNode parseProgram() {
         List<Statement> statements = new java.util.ArrayList<>();
-        while (current < tokens.size()) {
+        while (!isAtEnd()) {
             statements.add(parseStatement());
         }
         return new ProgramNode(statements);
@@ -205,24 +208,23 @@ public class Parser {
             thenBranch.add(parseStatement());
         }
         consume(TokenType.RIGHT_BRACE);
-        if (peek().getType() == TokenType.ELSE) {
+        if(!isAtEnd()){
+           if (peek().getType() == TokenType.ELSE) {
+           if(peek(1).getType() == TokenType.LEFT_BRACE){
             consume(TokenType.ELSE);
-            if(peek().getType() == TokenType.WARD){
-                consume(TokenType.WARD);
-                consume(TokenType.LEFT_BRACE);
-                while (peek().getType() != TokenType.RIGHT_BRACE) {
-                    elseBranch.add(parseStatement());
-                }
-                consume(TokenType.RIGHT_BRACE);
-            }else if(peek().getType() == TokenType.LEFT_BRACE){
-                consume(TokenType.LEFT_BRACE);
-                while (peek().getType() != TokenType.RIGHT_BRACE) {
-                    elseBranch.add(parseStatement());
-                }
-                consume(TokenType.RIGHT_BRACE);
+            consume(TokenType.LEFT_BRACE);
+            while (peek().getType() != TokenType.RIGHT_BRACE) {
+                elseBranch.add(parseStatement());
             }
+            consume(TokenType.RIGHT_BRACE);
+        }else if(peek(1).getType() == TokenType.WARD){
+            consume(TokenType.ELSE);
+            elseBranch.add(parseIf());
         }
-        return new IfNode(condition,thenBranch,elseBranch);
+        } 
+        }
+        
+        return new IfNode(condition,thenBranch,elseBranch);  
     }
 
     private Statement parseWhile() {
