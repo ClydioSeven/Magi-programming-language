@@ -1,13 +1,13 @@
 public class UnaryOperationNode implements Expression {
-    private final Token operator;
+    private final TokenType operator;
     private final Expression operand;
 
-    public UnaryOperationNode(TokenType not, Expression operand) {
-        this.operator = not;
+    public UnaryOperationNode(TokenType operator, Expression operand) {
+        this.operator = operator;
         this.operand = operand;
     }
 
-    public Token getOperator() {
+    public TokenType getOperator() {
         return operator;
     }
 

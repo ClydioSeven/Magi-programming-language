@@ -149,9 +149,7 @@ public class Parser {
 
     private Expression parseExpression() {
         Expression expression = parseOrExpression();
-        
-
-        throw new UnsupportedOperationException("Unimplemented method 'parseExpression'");
+        return expression;
     }
 
     private Expression parseOrExpression() {
@@ -211,7 +209,7 @@ public class Parser {
                 return new BinaryOperationNode(left, TokenType.MODULO, right);
             }
         }
-        return new BinaryOperationNode(null, null, null);
+        return null;
     }
 
     private Expression parseFactor() {
@@ -219,11 +217,15 @@ public class Parser {
         return switch (next.getType()) {
             case INTEGER -> {
                 consume(TokenType.INTEGER);
-                yield new IntLiteralNode(next.getValue());
+                yield new IntLiteralNode(
+                    Integer.parseInt(next.getValue())
+                );
             }
             case DOUBLE -> {
                 consume(TokenType.DOUBLE);
-                yield new DoubleLiteralNode(next.getValue());
+                yield new DoubleLiteralNode(
+                    Double.parseDouble(next.getValue())
+                );            
             }
             case STRING -> {
                 consume(TokenType.STRING);
@@ -277,11 +279,37 @@ public class Parser {
                 return new BinaryOperationNode(left, TokenType.MINUS, right);
             }
         }
-        return new BinaryOperationNode(null, null, null);
+        return null;
     }
 
     private Expression parseComparisonTail() {
-        // TODO Auto-generated method stub
+        Token next = peek();
+        switch (next.getType()) {
+            case LESS_THAN -> {
+                consume(TokenType.LESS_THAN);
+                Expression right = parseAdditiveExpression();
+                Expression left = parseComparisonTail();
+                return new BinaryOperationNode(left, TokenType.LESS_THAN, right);
+            }
+            case LESS_EQUAL -> {
+                consume(TokenType.LESS_EQUAL);
+                Expression right = parseAdditiveExpression();
+                Expression left = parseComparisonTail();
+                return new BinaryOperationNode(left, TokenType.LESS_EQUAL, right);
+            }
+            case GREATER_THAN -> {
+                consume(TokenType.GREATER_THAN);
+                Expression right = parseAdditiveExpression();
+                Expression left = parseComparisonTail();
+                return new BinaryOperationNode(left, TokenType.GREATER_THAN, right);
+            }
+            case GREATER_EQUAL -> {
+                consume(TokenType.GREATER_EQUAL);
+                Expression right = parseAdditiveExpression();
+                Expression left = parseComparisonTail();
+                return new BinaryOperationNode(left, TokenType.GREATER_EQUAL, right);
+            }
+        }
         throw new UnsupportedOperationException("Unimplemented method 'ComparisonTail'");
     }
 
@@ -302,7 +330,7 @@ public class Parser {
             }
             
         };
-        return new BinaryOperationNode(null, null, null);
+        return null;
         
     }
 
@@ -314,7 +342,7 @@ public class Parser {
             Expression left = AndTail();
             return new BinaryOperationNode(left, TokenType.AMPAMP, right);
         }
-        return new BinaryOperationNode(null, null, null);
+        return null;
     }
 
     private Expression OrTail() {
@@ -325,7 +353,7 @@ public class Parser {
             Expression left = OrTail();
             return new BinaryOperationNode(left, TokenType.VERTBARBAR, right);
         }
-        return new BinaryOperationNode(null, null, null);
+        return null;
     }
 
     private Statement parseFor() {
