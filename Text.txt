@@ -1,1 +1,1 @@
-Rune x = -5;
+Spell Fireball = "Fireball";
