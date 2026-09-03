@@ -148,36 +148,33 @@ public class Parser {
     }
 
     private Expression parseExpression() {
-        Expression expression = parseOrExpression();
-        return expression;
+        return parseOrExpression();
     }
 
     private Expression parseOrExpression() {
         Expression left = parseAndExpression();
-        Expression right = OrTail();
-        return new BinaryOperationNode(left, TokenType.VERTBARBAR, right);
+        return parseOrTail(left);
+        
     }
 
     private Expression parseAndExpression() {
         Expression left = parseEqualityExpression();
-        Expression right = AndTail();
-        return new BinaryOperationNode(left, TokenType.AMPAMP, right);
+        return parseAndTail(left);
+        
     }
     private Expression parseEqualityExpression() {
         Expression left = parseComparisonExpression();
-        Expression right = EqualityTail();
-        return new BinaryOperationNode(left, TokenType.EQUALS_EQUALS, right);
+        return parseEqualityTail(left);
+        
     }
     private Expression parseComparisonExpression() {
         Expression left = parseAdditiveExpression();
-        Expression right = parseComparisonTail();
-        return new BinaryOperationNode(left, null, right);
+        return parseComparisonTail(left);
     }
 
     private Expression parseAdditiveExpression() {
         Expression left = parseTerm();
-        Expression right = parseAdditiveTail();
-        return new BinaryOperationNode(left, null, right);
+        return parseAdditiveTail(left);
     }
 
     private Expression parseTerm() {
@@ -263,97 +260,97 @@ public class Parser {
         };
     }
 
-    private Expression parseAdditiveTail() {
+    private Expression parseAdditiveTail(Expression leftExpression) {
         Token next = peek();
         switch (next.getType()) {
             case PLUS -> {
                 consume(TokenType.PLUS);
-                Expression right = parseTerm();
-                Expression left = parseAdditiveTail();
-                return new BinaryOperationNode(left, TokenType.PLUS, right);
+                    Expression right = parseTerm();
+                    Expression combined = new BinaryOperationNode(leftExpression, TokenType.PLUS, right);
+                    return parseAdditiveTail(combined);
             }
             case MINUS -> {
                 consume(TokenType.MINUS);
-                Expression right = parseTerm();
-                Expression left = parseAdditiveTail();
-                return new BinaryOperationNode(left, TokenType.MINUS, right);
+                    Expression right = parseTerm();
+                    Expression combined = new BinaryOperationNode(leftExpression, TokenType.MINUS, right);
+                    return parseAdditiveTail(combined);
             }
         }
-        return null;
+        return leftExpression;
     }
 
-    private Expression parseComparisonTail() {
+    private Expression parseComparisonTail(Expression leftExpression) {
         Token next = peek();
         switch (next.getType()) {
             case LESS_THAN -> {
                 consume(TokenType.LESS_THAN);
                 Expression right = parseAdditiveExpression();
-                Expression left = parseComparisonTail();
-                return new BinaryOperationNode(left, TokenType.LESS_THAN, right);
+                Expression combined = new BinaryOperationNode(leftExpression, TokenType.LESS_THAN, right);
+                return parseComparisonTail(combined);
             }
             case LESS_EQUAL -> {
                 consume(TokenType.LESS_EQUAL);
                 Expression right = parseAdditiveExpression();
-                Expression left = parseComparisonTail();
-                return new BinaryOperationNode(left, TokenType.LESS_EQUAL, right);
+                Expression combined = new BinaryOperationNode(leftExpression, TokenType.LESS_EQUAL, right);
+                return parseComparisonTail(combined);
             }
             case GREATER_THAN -> {
                 consume(TokenType.GREATER_THAN);
                 Expression right = parseAdditiveExpression();
-                Expression left = parseComparisonTail();
-                return new BinaryOperationNode(left, TokenType.GREATER_THAN, right);
+                Expression combined = new BinaryOperationNode(leftExpression, TokenType.GREATER_THAN, right);
+                return parseComparisonTail(combined);
             }
             case GREATER_EQUAL -> {
                 consume(TokenType.GREATER_EQUAL);
                 Expression right = parseAdditiveExpression();
-                Expression left = parseComparisonTail();
-                return new BinaryOperationNode(left, TokenType.GREATER_EQUAL, right);
+                Expression combined = new BinaryOperationNode(leftExpression, TokenType.GREATER_EQUAL, right);
+                return parseComparisonTail(combined);
             }
         }
-        return null;
+        return leftExpression;
     }
 
-    private Expression EqualityTail() {
+    private Expression parseEqualityTail(Expression leftExpression) {
         Token next = peek();
         switch (next.getType()) {
             case EQUALS_EQUALS -> {
                 consume(TokenType.EQUALS_EQUALS);
                 Expression right = parseComparisonExpression();
-                Expression left = EqualityTail();
-                return new BinaryOperationNode(left, TokenType.EQUALS_EQUALS, right);
+                Expression combined = new BinaryOperationNode(leftExpression, TokenType.EQUALS_EQUALS, right);
+                return parseEqualityTail(combined);
             }
             case NOT_EQUAL ->{
                 consume(TokenType.NOT_EQUAL);
                 Expression right = parseComparisonExpression();
-                Expression left = EqualityTail();
-                return new BinaryOperationNode(left, TokenType.NOT_EQUAL, right);
+                Expression combined = new BinaryOperationNode(leftExpression, TokenType.NOT_EQUAL, right);
+                return parseEqualityTail(combined);
             }
             
         };
-        return null;
+        return leftExpression;
         
     }
 
-    private Expression AndTail() {
+    private Expression parseAndTail(Expression leftExpression) {
         Token next = peek();
         if(next.getType() == TokenType.AMPAMP){
             consume(TokenType.AMPAMP);
             Expression right = parseEqualityExpression();
-            Expression left = AndTail();
-            return new BinaryOperationNode(left, TokenType.AMPAMP, right);
+            Expression combined = new BinaryOperationNode(leftExpression, TokenType.AMPAMP, right);
+            return parseAndTail(combined);
         }
-        return null;
+        return leftExpression;
     }
 
-    private Expression OrTail() {
+    private Expression parseOrTail(Expression leftExpression) {
         Token next = peek();
         if(next.getType() == TokenType.VERTBARBAR){
             consume(TokenType.VERTBARBAR);
             Expression right = parseAndExpression();
-            Expression left = OrTail();
-            return new BinaryOperationNode(left, TokenType.VERTBARBAR, right);
+            Expression combined = new BinaryOperationNode(leftExpression, TokenType.VERTBARBAR, right);
+            return parseOrTail(combined);
         }
-        return null;
+        return leftExpression;
     }
 
     private Statement parseFor() {
