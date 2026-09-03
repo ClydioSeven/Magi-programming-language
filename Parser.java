@@ -182,34 +182,34 @@ public class Parser {
 
     private Expression parseTerm() {
         Expression left = parseFactor();
-        Expression right = parseTermTail();
-        return new BinaryOperationNode(left, null, right);
+        return parseTermTail(left);
         
     }
 
-    private Expression parseTermTail() {
+    private Expression parseTermTail(Expression LeftExpression) {
         Token next = peek();
         switch (next.getType()) {
             case MULTIPLY -> {
                 consume(TokenType.MULTIPLY);
-                Expression right = parseFactor();
-                Expression left = parseTermTail();
-                return new BinaryOperationNode(left, TokenType.MULTIPLY, right);
-            }
+                    Expression right = parseFactor();
+                    Expression combined = new BinaryOperationNode(LeftExpression, TokenType.MULTIPLY, right);
+                return parseTermTail(combined);
+                }
             case DIVIDE -> {
                 consume(TokenType.DIVIDE);
-                Expression right = parseFactor();
-                Expression left = parseTermTail();
-                return new BinaryOperationNode(left, TokenType.DIVIDE, right);
+                    Expression right = parseFactor();
+                    Expression combined = new BinaryOperationNode(LeftExpression, TokenType.DIVIDE, right);
+                return parseTermTail(combined);
             }
             case MODULO -> {
                 consume(TokenType.MODULO);
-                Expression right = parseFactor();
-                Expression left = parseTermTail();
-                return new BinaryOperationNode(left, TokenType.MODULO, right);
+                    Expression right = parseFactor();
+                    Expression combined = new BinaryOperationNode(LeftExpression, TokenType.MODULO, right);
+                return parseTermTail(combined);
+                
             }
         }
-        return null;
+        return LeftExpression;
     }
 
     private Expression parseFactor() {
@@ -310,7 +310,7 @@ public class Parser {
                 return new BinaryOperationNode(left, TokenType.GREATER_EQUAL, right);
             }
         }
-        throw new UnsupportedOperationException("Unimplemented method 'ComparisonTail'");
+        return null;
     }
 
     private Expression EqualityTail() {
