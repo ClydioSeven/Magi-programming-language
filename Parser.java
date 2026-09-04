@@ -493,9 +493,9 @@ public class Parser {
     private Statement parsePrint() {
         consume(TokenType.CAST);
         consume(TokenType.LEFT_PAREN);
-        
+        Expression expression = parseExpression();
         consume(TokenType.RIGHT_PAREN);
-        throw new UnsupportedOperationException("Unimplemented method 'parsePrint'");
+        return new PrintNode(expression);
     }
 
     private Statement parseBooleanDeclaration() {

@@ -3,7 +3,6 @@ public class Token {
     private final TokenType type;
     private final String value;
 
-    // Main constructor
     public Token(TokenType type, String value) {
         this.type = type;
         this.value = value;
