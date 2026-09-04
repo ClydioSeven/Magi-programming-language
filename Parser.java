@@ -86,11 +86,33 @@ public class Parser {
                         "Unexpected token: " + token);
         };
     }
+    private Statement parseStatementFor() {
+
+        Token token = peek();
+
+        return switch (token.getType()) {
+
+            case RUNE ->
+                parseIntDeclaration();
+
+            case GLYPH ->
+                parseDoubleDeclaration();
+
+            case SIGIL ->
+                parseBooleanDeclaration();
+
+            case IDENTIFIER ->
+                parseIdentifierStatement();
+
+            default ->
+                throw new RuntimeException(
+                        "Unexpected token: " + token);
+        };
+    }
 
     private Statement parseIdentifierStatement() {
     Token next = peek(1);
     return switch (next.getType()) {
-
         case EQUALS ->
             parseAssignment();
 
@@ -105,12 +127,44 @@ public class Parser {
                 "Unexpected token after identifier: " + next
             );
     };
-}
+    }
+    private Statement parseIdentifierStatementFor() {
+    Token next = peek(1);
+    return switch (next.getType()) {
+        case EQUALS ->
+            parseAssignmentFor();
+
+        case PLUS_PLUS ->
+            parseIncrementFor();
+
+        case MINUS_MINUS ->
+            parseDecrementFor();
+
+        default ->
+            throw new RuntimeException(
+                "Unexpected token after identifier: " + next
+            );
+    };
+    }
 
     private Statement parseDecrement() {
         Token identifier = consume(TokenType.IDENTIFIER);
         consume(TokenType.MINUS_MINUS);
         consume(TokenType.SEMICOLON);
+
+        String name= identifier.getValue();
+        return new AssignmentNode(
+            name,
+            new BinaryOperationNode(
+                new IdentifierNode(name),
+                TokenType.MINUS,
+                new IntLiteralNode(1)
+            )
+        );
+    }
+    private Statement parseDecrementFor() {
+        Token identifier = consume(TokenType.IDENTIFIER);
+        consume(TokenType.MINUS_MINUS);
 
         String name= identifier.getValue();
         return new AssignmentNode(
@@ -138,12 +192,32 @@ public class Parser {
             )
         );
     }
+    private Statement parseIncrementFor() {
+        Token identifier = consume(TokenType.IDENTIFIER);
+        consume(TokenType.PLUS_PLUS);
+
+        String name= identifier.getValue();
+        return new AssignmentNode(
+            name,
+            new BinaryOperationNode(
+                new IdentifierNode(name),
+                TokenType.PLUS,
+                new IntLiteralNode(1)
+            )
+        );
+    }
 
     private Statement parseAssignment() {
         Token identifier = consume(TokenType.IDENTIFIER);
         consume(TokenType.EQUALS);
         Expression value = parseExpression();
         consume(TokenType.SEMICOLON);
+        return new AssignmentNode(identifier.getValue(), value);
+    }
+    private Statement parseAssignmentFor() {
+        Token identifier = consume(TokenType.IDENTIFIER);
+        consume(TokenType.EQUALS);
+        Expression value = parseExpression();
         return new AssignmentNode(identifier.getValue(), value);
     }
 
@@ -356,12 +430,10 @@ public class Parser {
     private Statement parseFor() {
         consume(TokenType.BARRAGE);
         consume(TokenType.LEFT_PAREN);
-        Token next = peek();
-        Statement initialization = parseStatement();
-        consume(TokenType.SEMICOLON);
+        Statement initialization = parseStatementFor();
         Expression condition = parseExpression();
         consume(TokenType.SEMICOLON);
-        //Increment/Decrement or Expression
+        Statement increment = parseIdentifierStatementFor();
         consume(TokenType.RIGHT_PAREN);
         consume(TokenType.LEFT_BRACE);
         List<Statement> body = new ArrayList<>();
@@ -369,11 +441,7 @@ public class Parser {
             body.add(parseStatement());
         }
         consume(TokenType.RIGHT_BRACE);
-        //Remove later 
-        Statement increment = parseIdentifierStatement();
         return new ForNode(initialization, condition, increment, body);
-
-
     }
 
     private Statement parseIf() {
@@ -431,8 +499,25 @@ public class Parser {
     }
 
     private Statement parseBooleanDeclaration() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'parseBooleanDeclaration'");
+        consume(TokenType.SIGIL);
+        Token identifier = consume(TokenType.IDENTIFIER);
+        consume(TokenType.EQUALS);
+        Token bool = consume(peek().getType() == TokenType.TRUE ? TokenType.TRUE : TokenType.FALSE);
+        consume(TokenType.SEMICOLON);
+        return new BooleanCreateNode(
+            identifier.getValue(),
+            new BooleanLiteralNode(bool.getType() == TokenType.TRUE)
+        );
+    }
+    private Statement parseBooleanDeclarationFor() {
+        consume(TokenType.SIGIL);
+        Token identifier = consume(TokenType.IDENTIFIER);
+        consume(TokenType.EQUALS);
+        Token bool = consume(peek().getType() == TokenType.TRUE ? TokenType.TRUE : TokenType.FALSE);
+        return new BooleanCreateNode(
+            identifier.getValue(),
+            new BooleanLiteralNode(bool.getType() == TokenType.TRUE)
+        );
     }
 
     private Statement parseStringDeclaration() {
@@ -451,15 +536,13 @@ public class Parser {
         consume(TokenType.GLYPH);
         Token identifier = consume(TokenType.IDENTIFIER);
         consume(TokenType.EQUALS);
-        Token number = consume(TokenType.DOUBLE);
+        Expression number = parseExpression();
         consume(TokenType.SEMICOLON);
 
         return new DoubleCreateNode(
             identifier.getValue(),
-            new DoubleLiteralNode(
-                Double.parseDouble(number.getValue())
-            )
-        );
+            number
+            );
     }
 
     private Statement parseIntDeclaration() {
@@ -468,16 +551,13 @@ public class Parser {
 
         consume(TokenType.EQUALS);
 
-        Token number =
-        consume(TokenType.INTEGER);
+        Expression number = parseExpression();
 
         consume(TokenType.SEMICOLON);
 
         return new IntCreateNode(
             identifier.getValue(),
-            new IntLiteralNode(
-                Integer.parseInt(number.getValue())
-            )
+            number
         );
     }
 }
