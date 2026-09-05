@@ -1,8 +1,9 @@
 public class StringCreateNode implements Statement {
-    private final String identifier;
-    private final StringLiteralNode value;
 
-    public StringCreateNode(String identifier, StringLiteralNode value) {
+    private final String identifier;
+    private final Expression value;
+
+    public StringCreateNode(String identifier, Expression value) {
         this.identifier = identifier;
         this.value = value;
     }
@@ -11,8 +12,7 @@ public class StringCreateNode implements Statement {
         return identifier;
     }
 
-    public StringLiteralNode getValue() {
+    public Expression getValue() {
         return value;
     }
-    
 }

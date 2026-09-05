@@ -8,5 +8,4 @@ public class BooleanLiteralNode implements Expression {
     public boolean getValue() {
         return value;
     }
-    
 }

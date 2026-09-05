@@ -1,8 +1,8 @@
 public class BooleanCreateNode implements Statement {
     private final String identifier;
-    private final BooleanLiteralNode value;
+    private final Expression value;
 
-    public BooleanCreateNode(String identifier, BooleanLiteralNode value) {
+    public BooleanCreateNode(String identifier, Expression value) {
         this.identifier = identifier;
         this.value = value;
     }
@@ -11,7 +11,7 @@ public class BooleanCreateNode implements Statement {
         return identifier;
     }
 
-    public BooleanLiteralNode getValue() {
+    public Expression getValue() {
         return value;
     }
 

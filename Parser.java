@@ -492,9 +492,10 @@ public class Parser {
 
     private Statement parsePrint() {
         consume(TokenType.CAST);
-        consume(TokenType.LEFT_PAREN);
+        consume(TokenType.LEFT_PAREN);  
         Expression expression = parseExpression();
         consume(TokenType.RIGHT_PAREN);
+        consume(TokenType.SEMICOLON);
         return new PrintNode(expression);
     }
 
@@ -502,33 +503,23 @@ public class Parser {
         consume(TokenType.SIGIL);
         Token identifier = consume(TokenType.IDENTIFIER);
         consume(TokenType.EQUALS);
-        Token bool = consume(peek().getType() == TokenType.TRUE ? TokenType.TRUE : TokenType.FALSE);
+        Expression expression = parseExpression();
         consume(TokenType.SEMICOLON);
         return new BooleanCreateNode(
             identifier.getValue(),
-            new BooleanLiteralNode(bool.getType() == TokenType.TRUE)
+            expression
         );
     }
-    private Statement parseBooleanDeclarationFor() {
-        consume(TokenType.SIGIL);
-        Token identifier = consume(TokenType.IDENTIFIER);
-        consume(TokenType.EQUALS);
-        Token bool = consume(peek().getType() == TokenType.TRUE ? TokenType.TRUE : TokenType.FALSE);
-        return new BooleanCreateNode(
-            identifier.getValue(),
-            new BooleanLiteralNode(bool.getType() == TokenType.TRUE)
-        );
-    }
-
+    
     private Statement parseStringDeclaration() {
         consume(TokenType.SPELL);
         Token identifier = consume(TokenType.IDENTIFIER);
         consume(TokenType.EQUALS);
-        Token string = consume(TokenType.STRING);
+        Expression string = parseExpression();
         consume(TokenType.SEMICOLON);
         return new StringCreateNode(
             identifier.getValue(),
-            new StringLiteralNode(string.getValue())
+            string
         );
     }
 
@@ -538,7 +529,6 @@ public class Parser {
         consume(TokenType.EQUALS);
         Expression number = parseExpression();
         consume(TokenType.SEMICOLON);
-
         return new DoubleCreateNode(
             identifier.getValue(),
             number
