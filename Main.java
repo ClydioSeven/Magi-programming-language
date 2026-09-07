@@ -20,6 +20,9 @@ public class Main {
 
         Tokenizer tokenizer = new Tokenizer(source);
         Parser parser = new Parser(tokenizer.getTokens());
+        ProgramNode program = parser.parseProgram();
+        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program);
+        
 } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }

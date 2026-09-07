@@ -7,7 +7,7 @@ public class AssignmentNode implements Statement {
         this.value = value;
     }
 
-    public String getName() {
+    public String getIdentifier() {
         return name;
     }
 

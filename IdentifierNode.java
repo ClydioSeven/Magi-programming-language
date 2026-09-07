@@ -5,7 +5,7 @@ public class IdentifierNode implements Expression {
         this.name = name;
     }
 
-    public String getName() {
+    public String getIdentifier() {
         return name;
     }
 }

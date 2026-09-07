@@ -1,4 +1,4 @@
-public class DoubleCreateNode implements Statement {
+public class DoubleCreateNode implements Statement,Helper {
     private final String name;
     private final Expression value;
 
@@ -7,7 +7,7 @@ public class DoubleCreateNode implements Statement {
         this.value = value;
     }
 
-    public String getName() {
+    public String getIdentifier() {
         return name;
     }
 

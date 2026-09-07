@@ -1,5 +1,4 @@
 public class StringCreateNode implements Statement {
-
     private final String identifier;
     private final Expression value;
 

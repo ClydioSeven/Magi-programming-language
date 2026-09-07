@@ -1,4 +1,4 @@
-public class IntCreateNode implements Statement {
+public class IntCreateNode implements Statement,Helper {
     private final String name;
     private final Expression value;
 
@@ -7,7 +7,7 @@ public class IntCreateNode implements Statement {
         this.value = value;
     }
 
-    public String getName() {
+    public String getIdentifier() {
         return name;
     }
 
