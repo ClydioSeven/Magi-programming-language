@@ -1,4 +1,4 @@
-public class StringCreateNode implements Statement {
+public class StringCreateNode implements Statement,Declaration {
     private final String identifier;
     private final Expression value;
 
@@ -13,5 +13,9 @@ public class StringCreateNode implements Statement {
 
     public Expression getValue() {
         return value;
+    }
+
+    public TokenType getType() {
+        return TokenType.SPELL;
     }
 }

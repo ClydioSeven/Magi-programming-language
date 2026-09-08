@@ -1,2 +1,1 @@
-Rune x=0;
-Glyph y=0;
+x++;

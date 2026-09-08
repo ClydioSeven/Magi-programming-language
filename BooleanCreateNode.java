@@ -1,4 +1,4 @@
-public class BooleanCreateNode implements Statement {
+public class BooleanCreateNode implements Statement,Declaration {
     private final String identifier;
     private final Expression value;
 
@@ -15,4 +15,7 @@ public class BooleanCreateNode implements Statement {
         return value;
     }
 
+    public TokenType getType() {
+        return TokenType.SIGIL;
+    }
 }

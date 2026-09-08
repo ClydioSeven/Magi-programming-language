@@ -1,4 +1,4 @@
-public class DoubleCreateNode implements Statement,Helper {
+public class DoubleCreateNode implements Statement,Declaration {
     private final String name;
     private final Expression value;
 
@@ -13,5 +13,9 @@ public class DoubleCreateNode implements Statement,Helper {
 
     public Expression getValue() {
         return value;
+    }
+
+    public TokenType getType() {
+        return TokenType.GLYPH;
     }
 }
