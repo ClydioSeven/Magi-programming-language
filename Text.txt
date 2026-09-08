@@ -1,1 +1,4 @@
-x++;
+Rune x=0;
+Glyph y=0;
+Sigil z=True;
+Spell Fireball="Fireball";
