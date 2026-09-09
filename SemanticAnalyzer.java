@@ -35,34 +35,44 @@ public class SemanticAnalyzer {
         if(statement instanceof ForNode){
             ForNode forNode = (ForNode) statement;
             analyze(forNode.getInitialization());
-            analyze(forNode.getCondition());
+            analyze(forNode.getCondition(),TokenType.WARD);
             analyze(forNode.getIncrement());
             analyzeList(forNode.getBody());
         }
         if(statement instanceof WhileNode){
             WhileNode whileNode = (WhileNode) statement;
-            analyze(whileNode.getCondition());
+            analyze(whileNode.getCondition(),TokenType.WARD);
             analyzeList(whileNode.getBody());
         }
         if(statement instanceof IfNode){
             IfNode ifNode = (IfNode) statement;
-            analyze(ifNode.getCondition());
+            analyze(ifNode.getCondition(),TokenType.WARD);
             analyzeList(ifNode.getThenBranch());
             analyzeList(ifNode.getElseBranch());
         }
         if(statement instanceof PrintNode){
             PrintNode printNode = (PrintNode) statement;
-            analyze(printNode.getExpression());
+            analyze(printNode.getExpression(),TokenType.CAST);
         }
         
     }
     private void analyze(Expression expression, TokenType Token){
-        switch (Token){
+        switch(Token){
+            case RUNE:
+                break;
+            case GLYPH:
+                break;
+            case SIGIL:
+                break;
+            case SPELL:
+                break;
+            case CAST:
+                break;
+            case WARD:
+                break;
             
         }
 
     }
-    private void analyze(Expression expression){
 
-    }
 }
