@@ -59,18 +59,62 @@ public class SemanticAnalyzer {
     private void analyze(Expression expression, TokenType Token){
         switch(Token){
             case RUNE:
+            traverse(expression);
                 break;
             case GLYPH:
+                traverse(expression);
                 break;
             case SIGIL:
+                traverse(expression);
                 break;
             case SPELL:
+                traverse(expression);
                 break;
             case CAST:
+                traverse(expression);
                 break;
             
         }
 
+    }
+    private void traverse(Expression expression){
+        switch(expression.getClass().getSimpleName()){
+            case "IntLiteralNode":
+                IntLiteralNode intLiteralNode = (IntLiteralNode) expression;
+                System.out.println("IntLiteralNode: " + intLiteralNode.getValue());
+                break;
+            case "StringLiteralNode":
+                StringLiteralNode stringLiteralNode = (StringLiteralNode) expression;
+                System.out.println("StringLiteralNode: " + stringLiteralNode.getValue());
+                break;
+            case "BooleanLiteralNode":
+                BooleanLiteralNode booleanLiteralNode = (BooleanLiteralNode) expression;
+                System.out.println("BooleanLiteralNode: " + booleanLiteralNode.getValue());
+                break;
+            case "DoubleLiteralNode":
+                DoubleLiteralNode doubleLiteralNode = (DoubleLiteralNode) expression;
+                System.out.println("DoubleLiteralNode: " + doubleLiteralNode.getValue());
+                break;
+            case "IdentifierNode":
+                IdentifierNode identifierNode = (IdentifierNode) expression;
+                System.out.println("IdentifierNode: " + identifierNode.getIdentifier());
+                break;
+            case "BinaryOperationNode":
+                BinaryOperationNode binaryExpressionNode = (BinaryOperationNode) expression;
+                System.out.println("BinaryExpressionNode: " + binaryExpressionNode.getOperator());
+                traverse(binaryExpressionNode.getRight());
+                traverse(binaryExpressionNode.getLeft());
+                
+                break;
+            case "UnaryExpressionNode":
+                UnaryOperationNode unaryExpressionNode = (UnaryOperationNode) expression;
+                System.out.println("UnaryExpressionNode: " + unaryExpressionNode.getOperator());
+                traverse(unaryExpressionNode.getOperand());
+                break;
+            default:
+                System.out.println("Unknown expression type: " + expression.getClass().getSimpleName());
+                break;
+        }
     }
 
 }

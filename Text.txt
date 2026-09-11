@@ -1,4 +1,2 @@
-Rune x=0;
-#Glyph x=0; Rune y=0; #
-#Guh# Glyph y=0;
-x++;
+# Comments #
+Rune x= 8*5+4-3*2+34-17;
