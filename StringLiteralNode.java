@@ -1,5 +1,6 @@
 public class StringLiteralNode implements Expression {
     private final String value;
+
     public StringLiteralNode(String value) {
         this.value = value;
     }
@@ -8,4 +9,7 @@ public class StringLiteralNode implements Expression {
         return value;
     }
 
+    public ExpressionType getExpressionType(){
+        return ExpressionType.StringLiteralNode;
+    }
 }

@@ -8,5 +8,8 @@ public class PrintNode implements Statement {
     public Expression getExpression() {
         return expression;
     }
+    public StatementType getStatementType(){
+        return StatementType.PrintNode;
+    }
 
 }

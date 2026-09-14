@@ -18,4 +18,7 @@ public class StringCreateNode implements Statement,Declaration {
     public TokenType getType() {
         return TokenType.SPELL;
     }
+    public StatementType getStatementType(){
+        return StatementType.StringCreateNode;
+    }
 }

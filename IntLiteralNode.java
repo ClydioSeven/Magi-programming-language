@@ -8,4 +8,7 @@ public class IntLiteralNode implements Expression {
     public Integer getValue() {
         return value;
     }
+    public ExpressionType getExpressionType(){
+        return ExpressionType.IntLiteralNode;
+    }
 }

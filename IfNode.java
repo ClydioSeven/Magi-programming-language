@@ -22,5 +22,8 @@ public class IfNode implements Statement {
     public List<Statement> getElseBranch() {
         return elseBranch;
     }
+    public StatementType getStatementType(){
+        return StatementType.IfNode;
+    }
 
 }

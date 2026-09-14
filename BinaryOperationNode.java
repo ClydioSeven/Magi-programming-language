@@ -20,4 +20,7 @@ public class BinaryOperationNode implements Expression {
     public Expression getRight() {
         return right;
     }
+    public ExpressionType getExpressionType(){
+        return ExpressionType.BinaryOperationNode;
+    }
 }

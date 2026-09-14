@@ -14,4 +14,7 @@ public class AssignmentNode implements Statement {
     public Expression getValue() {
         return value;
     }
+    public StatementType getStatementType(){
+        return StatementType.AssignmentNode;
+    }
 }

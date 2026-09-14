@@ -8,4 +8,7 @@ public class IdentifierNode implements Expression {
     public String getIdentifier() {
         return name;
     }
+    public ExpressionType getExpressionType(){
+        return ExpressionType.IdentifierNode;
+    }
 }

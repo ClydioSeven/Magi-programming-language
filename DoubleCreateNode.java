@@ -18,4 +18,7 @@ public class DoubleCreateNode implements Statement,Declaration {
     public TokenType getType() {
         return TokenType.GLYPH;
     }
+    public StatementType getStatementType(){
+        return StatementType.DoubleCreateNode;
+    }
 }

@@ -1,2 +1,2 @@
 # Comments #
-Rune x= 8*5+4-3*2+34-17;
+Rune x=5 > 3;

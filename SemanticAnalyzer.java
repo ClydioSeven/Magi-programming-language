@@ -6,115 +6,165 @@ public class SemanticAnalyzer {
     HashMap<String, TokenType> symbolTable = new HashMap<>();
 
     public SemanticAnalyzer(ProgramNode program) {
+        boolean flag=true;
         System.out.println("Semantic Analyzer");
         this.program = program;
         for(Statement statement : program.getStatements()) {
-            analyze(statement);
+            flag = analyze(statement);
+            if(!flag){
+                break;
+            }
+
         }
     }
 
-    private void analyzeList(List<Statement> statements) {
+    private boolean analyzeList(List<Statement> statements) {
+        boolean flag=true;
         for(Statement statement : statements) {
             analyze(statement);
+            if(!flag) return false;
         }
+        return true;
     }
-    private void analyze(Statement statement) {
-        if(statement instanceof Declaration){
-            Declaration declaration = (Declaration) statement;
-            if(symbolTable.containsKey(declaration.getIdentifier())){
-                System.out.println("Error: Variable " + declaration.getIdentifier() + " is already declared.");
-            }else{
-                analyze(declaration.getValue(), declaration.getType());
-                symbolTable.put(declaration.getIdentifier(), declaration.getType());
-            }
-        }
-        if(statement instanceof AssignmentNode && !symbolTable.containsKey(((AssignmentNode) statement).getIdentifier())) {
-            AssignmentNode assignment = (AssignmentNode)statement;
-            System.out.println("Error: Variable " + assignment.getIdentifier() + " is not declared.");
-        }
-        if(statement instanceof ForNode){
-            ForNode forNode = (ForNode) statement;
-            analyze(forNode.getInitialization());
-            analyze(forNode.getCondition(),TokenType.SIGIL);
-            analyze(forNode.getIncrement());
-            analyzeList(forNode.getBody());
-        }
-        if(statement instanceof WhileNode){
-            WhileNode whileNode = (WhileNode) statement;
-            analyze(whileNode.getCondition(),TokenType.SIGIL);
-            analyzeList(whileNode.getBody());
-        }
-        if(statement instanceof IfNode){
-            IfNode ifNode = (IfNode) statement;
-            analyze(ifNode.getCondition(),TokenType.SIGIL);
-            analyzeList(ifNode.getThenBranch());
-            analyzeList(ifNode.getElseBranch());
-        }
-        if(statement instanceof PrintNode){
-            PrintNode printNode = (PrintNode) statement;
-            analyze(printNode.getExpression(),TokenType.CAST);
+    private boolean analyze(Statement statement) {
+        switch(statement.getStatementType()){
+            case AssignmentNode:
+                AssignmentNode assignment = (AssignmentNode)statement;
+                return symbolTable.containsKey(assignment.getIdentifier()) && analyze(assignment.getValue(),symbolTable.get(assignment.getIdentifier()));
+            case BooleanCreateNode:
+            case DoubleCreateNode:
+            case IntCreateNode:
+            case StringCreateNode:
+                 Declaration declaration = (Declaration)statement;
+                return analyze(declaration.getValue(),declaration.getType());
+            case ForNode:
+                ForNode forNode = (ForNode) statement;
+                return analyze(forNode.getInitialization())  && 
+                analyze(forNode.getCondition(),TokenType.SIGIL) &&
+                analyze(forNode.getIncrement()) &&
+                analyzeList(forNode.getBody());
+            case IfNode:
+                IfNode ifNode = (IfNode) statement;
+                return analyze(ifNode.getCondition(),TokenType.SIGIL) &&
+                analyzeList(ifNode.getThenBranch()) &&
+                analyzeList(ifNode.getElseBranch());
+            case PrintNode:
+                PrintNode printNode = (PrintNode) statement;
+                return analyze(printNode.getExpression(),TokenType.CAST);
+            case WhileNode:
+                WhileNode whileNode = (WhileNode) statement;
+                return analyze(whileNode.getCondition(),TokenType.SIGIL) &&
+                analyzeList(whileNode.getBody());
+            default:
+                return false;
+            
         }
         
     }
-    private void analyze(Expression expression, TokenType Token){
+
+    private boolean analyze(Expression expression, TokenType Token){
         switch(Token){
             case RUNE:
-            traverse(expression);
-                break;
             case GLYPH:
-                traverse(expression);
-                break;
+                return traverseNum(expression);
             case SIGIL:
-                traverse(expression);
-                break;
+                return traverseSigil(expression);
             case SPELL:
-                traverse(expression);
-                break;
+                return traverseSpell(expression);
             case CAST:
-                traverse(expression);
-                break;
-            
+                return traverseCast(expression);
+            default:
+                return false;
         }
 
     }
     private void traverse(Expression expression){
-        switch(expression.getClass().getSimpleName()){
-            case "IntLiteralNode":
+        switch(expression.getExpressionType()){
+            case IntLiteralNode:
                 IntLiteralNode intLiteralNode = (IntLiteralNode) expression;
                 System.out.println("IntLiteralNode: " + intLiteralNode.getValue());
                 break;
-            case "StringLiteralNode":
+            case StringLiteralNode:
                 StringLiteralNode stringLiteralNode = (StringLiteralNode) expression;
                 System.out.println("StringLiteralNode: " + stringLiteralNode.getValue());
                 break;
-            case "BooleanLiteralNode":
+            case BooleanLiteralNode:
                 BooleanLiteralNode booleanLiteralNode = (BooleanLiteralNode) expression;
                 System.out.println("BooleanLiteralNode: " + booleanLiteralNode.getValue());
                 break;
-            case "DoubleLiteralNode":
+            case DoubleLiteralNode:
                 DoubleLiteralNode doubleLiteralNode = (DoubleLiteralNode) expression;
                 System.out.println("DoubleLiteralNode: " + doubleLiteralNode.getValue());
                 break;
-            case "IdentifierNode":
+            case IdentifierNode:
                 IdentifierNode identifierNode = (IdentifierNode) expression;
-                System.out.println("IdentifierNode: " + identifierNode.getIdentifier());
-                break;
-            case "BinaryOperationNode":
-                BinaryOperationNode binaryExpressionNode = (BinaryOperationNode) expression;
-                System.out.println("BinaryExpressionNode: " + binaryExpressionNode.getOperator());
-                traverse(binaryExpressionNode.getRight());
-                traverse(binaryExpressionNode.getLeft());
+                if(symbolTable.containsKey(identifierNode.getIdentifier())){
+                    System.out.println("Valid IdentifierNode: " + identifierNode.getIdentifier());
+                }else{
+                    System.out.println("Invalid IdentifierNode: " + identifierNode.getIdentifier());
+                }
                 
                 break;
-            case "UnaryExpressionNode":
-                UnaryOperationNode unaryExpressionNode = (UnaryOperationNode) expression;
-                System.out.println("UnaryExpressionNode: " + unaryExpressionNode.getOperator());
-                traverse(unaryExpressionNode.getOperand());
+            case BinaryOperationNode:
+                BinaryOperationNode binaryOperationNode = (BinaryOperationNode) expression;
+                System.out.println("BinaryExpressionNode: " + binaryOperationNode.getOperator());
+                traverse(binaryOperationNode.getRight());
+                traverse(binaryOperationNode.getLeft());
+                
+                break;
+            case UnaryOperationNode:
+                UnaryOperationNode unaryOperationNode = (UnaryOperationNode) expression;
+                System.out.println("UnaryExpressionNode: " + unaryOperationNode.getOperator());
+                traverse(unaryOperationNode.getOperand());
                 break;
             default:
                 System.out.println("Unknown expression type: " + expression.getClass().getSimpleName());
                 break;
         }
     }
+    private boolean traverseNum(Expression expression){
+        switch(expression.getExpressionType()){
+            case StringLiteralNode:
+            case BooleanLiteralNode:
+            case UnaryOperationNode:
+                return false;
+            case IdentifierNode:
+                IdentifierNode identifierNode = (IdentifierNode) expression;
+                if(symbolTable.containsKey(identifierNode.getIdentifier())){
+                    TokenType type = symbolTable.get(identifierNode.getIdentifier());
+                    if(type == TokenType.RUNE || type ==TokenType.GLYPH)return true;
+                }
+                return false;
+            case BinaryOperationNode:
+                BinaryOperationNode binaryExpressionNode = (BinaryOperationNode) expression;
+                System.out.println("BinaryExpressionNode: " + binaryExpressionNode.getOperator());
+                return traverseNum(binaryExpressionNode.getRight()) && traverseNum(binaryExpressionNode.getLeft());
+            default:
+                return true;
+        }
+    }
+    private boolean traverseSigil(Expression expression){
+        switch(expression.getExpressionType()){
+            case BinaryOperationNode:
+                BinaryOperationNode binaryExpressionNode = (BinaryOperationNode) expression;
+                System.out.println("BinaryExpressionNode: " + binaryExpressionNode.getOperator());
+                return traverseSigil(binaryExpressionNode.getRight()) && traverseNum(binaryExpressionNode.getLeft());
+            default:
+                return true;
+        }
+    }
+    private boolean traverseSpell(Expression expression){
+        switch(expression.getExpressionType()){
+            default:
+            return true;
+        }
+    }
+    private boolean traverseCast(Expression expression){
+        switch(expression.getExpressionType()){
+            default:
+            return true;
+        }
+    }
+
 
 }

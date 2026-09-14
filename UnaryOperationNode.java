@@ -15,4 +15,7 @@ public class UnaryOperationNode implements Expression {
         return operand;
     }
     
+    public ExpressionType getExpressionType(){
+        return ExpressionType.UnaryOperationNode;
+    }
 }

@@ -28,5 +28,8 @@ public class ForNode implements Statement {
     public List<Statement> getBody() {
         return body;
     }
+    public StatementType getStatementType(){
+        return StatementType.ForNode;
+    }
 
 }

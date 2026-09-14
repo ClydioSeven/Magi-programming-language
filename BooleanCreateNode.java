@@ -18,4 +18,7 @@ public class BooleanCreateNode implements Statement,Declaration {
     public TokenType getType() {
         return TokenType.SIGIL;
     }
+    public StatementType getStatementType(){
+        return StatementType.BooleanCreateNode;
+    }
 }

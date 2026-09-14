@@ -18,4 +18,7 @@ public class IntCreateNode implements Statement,Declaration {
     public TokenType getType() {
         return TokenType.RUNE;
     }
+    public StatementType getStatementType(){
+        return StatementType.IntCreateNode;
+    }
 }

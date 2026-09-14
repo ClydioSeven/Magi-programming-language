@@ -8,4 +8,7 @@ public class DoubleLiteralNode implements Expression {
     public Double getValue() {
         return value;
     }
+    public ExpressionType getExpressionType(){
+        return ExpressionType.DoubleLiteralNode;
+    }
 }

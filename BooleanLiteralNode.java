@@ -8,4 +8,7 @@ public class BooleanLiteralNode implements Expression {
     public boolean getValue() {
         return value;
     }
+    public ExpressionType getExpressionType(){
+        return ExpressionType.BooleanLiteralNode;
+    }
 }

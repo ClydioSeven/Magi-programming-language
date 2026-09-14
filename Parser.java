@@ -52,39 +52,38 @@ public class Parser {
 
         Token token = peek();
 
-        return switch (token.getType()) {
+        switch (token.getType()) {
+            case RUNE:
+                return parseIntDeclaration();
 
-            case RUNE ->
-                parseIntDeclaration();
+            case GLYPH:
+                return parseDoubleDeclaration();
 
-            case GLYPH ->
-                parseDoubleDeclaration();
+            case SPELL:
+                return parseStringDeclaration();
 
-            case SPELL ->
-                parseStringDeclaration();
+            case SIGIL:
+                return parseBooleanDeclaration();
 
-            case SIGIL ->
-                parseBooleanDeclaration();
+            case CAST:
+                return parsePrint();
 
-            case CAST ->
-                parsePrint();
+            case CHANT:
+                return parseWhile();
 
-            case CHANT ->
-                parseWhile();
+            case WARD:
+                return parseIf();
 
-            case WARD ->
-                parseIf();
+            case BARRAGE:
+                return parseFor();
 
-            case BARRAGE ->
-                parseFor();
+            case IDENTIFIER:
+                return parseIdentifierStatement();
 
-            case IDENTIFIER ->
-                parseIdentifierStatement();
-
-            default ->
+            default:
                 throw new RuntimeException(
                         "Unexpected token: " + token);
-        };
+        }
     }
     private Statement parseStatementFor() {
 

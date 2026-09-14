@@ -121,7 +121,7 @@ public class Tokenizer {
                 tokens.add(TokenAdder(-3, source.substring(l, current)));
             }
 
-            System.out.println(tokens);
+            //System.out.println(tokens);
     }
 
     private boolean needsRetract(int delta) {
