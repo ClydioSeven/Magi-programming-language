@@ -26,15 +26,9 @@ public class Tokenizer {
 
     int state = 0;
     int delta = 0;
-
     String source;
-
-    // l = lexeme start
     int l = 0;
-
-    // current = current character
     int current = 0;
-
     AsTable asTable = new AsTable();
 
     int[][] DFA = {
@@ -120,14 +114,10 @@ public class Tokenizer {
             else if (state == 3) {
                 tokens.add(TokenAdder(-3, source.substring(l, current)));
             }
-
-            //System.out.println(tokens);
     }
 
     private boolean needsRetract(int delta) {
-
         switch(delta) {
-
             case -1:
             case -2:
             case -3:

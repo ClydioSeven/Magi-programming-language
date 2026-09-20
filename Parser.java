@@ -11,26 +11,26 @@ public class Parser {
 
     private Token peek() {
         if (isAtEnd()) {
-            throw new RuntimeException("Unexpected end of program.");
+            throw new ArchMagi("Unexpected end of program.");
         }
     return tokens.get(current);
 }
 
     private Token peek(int distance) {
     if (current + distance >= tokens.size()) {
-        throw new RuntimeException("Unexpected end of program.");
+        throw new ArchMagi("Unexpected end of program.");
     }
     return tokens.get(current + distance);
 }
 
     private Token consume(TokenType expected) {
         if (current >= tokens.size()) {
-            throw new RuntimeException("Unexpected end, expected: " + expected);
+            throw new ArchMagi("Unexpected end, expected: " + expected);
         }
 
         Token token = tokens.get(current);
         if (token.getType() != expected) {
-            throw new RuntimeException("Unexpected token: " + token.getType() + ", expected: " + expected);
+            throw new ArchMagi("Unexpected token: " + token.getType() + ", expected: " + expected);
         }
 
         current++;
@@ -81,7 +81,7 @@ public class Parser {
                 return parseIdentifierStatement();
 
             default:
-                throw new RuntimeException(
+                throw new ArchMagi(
                         "Unexpected token: " + token);
         }
     }
@@ -104,7 +104,7 @@ public class Parser {
                 parseIdentifierStatement();
 
             default ->
-                throw new RuntimeException(
+                throw new ArchMagi(
                         "Unexpected token: " + token);
         };
     }
@@ -122,9 +122,8 @@ public class Parser {
             parseDecrement();
 
         default ->
-            throw new RuntimeException(
-                "Unexpected token after identifier: " + next
-            );
+            throw new ArchMagi(
+                "Unexpected token after identifier: " + next);
     };
     }
     private Statement parseIdentifierStatementFor() {
@@ -140,9 +139,8 @@ public class Parser {
             parseDecrementFor();
 
         default ->
-            throw new RuntimeException(
-                "Unexpected token after identifier: " + next
-            );
+            throw new ArchMagi(
+                "Unexpected token after identifier: " + next);
     };
     }
 
@@ -284,53 +282,54 @@ public class Parser {
 
     private Expression parseFactor() {
         Token next = peek();
-        return switch (next.getType()) {
-            case INTEGER -> {
+        switch (next.getType()) {
+            case INTEGER: 
                 consume(TokenType.INTEGER);
-                yield new IntLiteralNode(
+                return new IntLiteralNode(
                     Integer.parseInt(next.getValue())
                 );
-            }
-            case DOUBLE -> {
+            
+            case DOUBLE:
                 consume(TokenType.DOUBLE);
-                yield new DoubleLiteralNode(
+                return new DoubleLiteralNode(
                     Double.parseDouble(next.getValue())
                 );            
-            }
-            case STRING -> {
+            
+            case STRING: 
                 consume(TokenType.STRING);
-                yield new StringLiteralNode(next.getValue());
-            }
-            case TRUE -> {
+                return new StringLiteralNode(next.getValue());
+            
+            case TRUE:
                 consume(TokenType.TRUE);
-                yield new BooleanLiteralNode(true);
-            }
-            case FALSE -> {
+                return  new BooleanLiteralNode(true);
+            
+            case FALSE:
                 consume(TokenType.FALSE);
-                yield new BooleanLiteralNode(false);
-            }
-            case IDENTIFIER -> {
+                return new BooleanLiteralNode(false);
+            
+            case IDENTIFIER: 
                 consume(TokenType.IDENTIFIER);
-                yield new IdentifierNode(next.getValue());
-            }
-            case LEFT_PAREN -> {
+                return new IdentifierNode(next.getValue());
+            
+            case LEFT_PAREN: {
                 consume(TokenType.LEFT_PAREN);
                 Expression expression = parseExpression();
                 consume(TokenType.RIGHT_PAREN);
-                yield expression;
+                return expression;
             }
-            case NOT -> {
+            case NOT: {
                 consume(TokenType.NOT);
                 Expression expression = parseFactor();
-                yield new UnaryOperationNode(TokenType.NOT, expression);
+                return new UnaryOperationNode(TokenType.NOT, expression);
             }
-            case MINUS -> {
+            case MINUS: {
                 consume(TokenType.MINUS);
                 Expression expression = parseFactor();
-                yield new UnaryOperationNode(TokenType.MINUS, expression);
+                return new UnaryOperationNode(TokenType.MINUS, expression);
             }
-            default -> throw new IllegalArgumentException("Unexpected token: " + next.getType());
-        };
+            default:
+                throw new ArchMagi("Unexpected token: " + next.getType());
+        }
     }
 
     private Expression parseAdditiveTail(Expression leftExpression) {

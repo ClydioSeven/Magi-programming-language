@@ -1,7 +1,4 @@
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,18 +9,22 @@ public class Main {
             System.out.println("Usage:java MyProgram <filename>");
             return;
         }
-        
-        try (InputStream in = new FileInputStream(args[0])) {
-                String source = Files.readString(Path.of(args[0]), StandardCharsets.UTF_8)
-        .replace("\r\n", "\n")
-        .replace("\r", "\n");
+        try {
+            String source = Files.readString(Path.of(args[0]), StandardCharsets.UTF_8)
+            .replace("\r\n", "\n")
+            .replace("\r", "\n");
+        try {
+            Tokenizer tokenizer = new Tokenizer(source);
+            System.out.println(tokenizer.getTokens());
+            Parser parser = new Parser(tokenizer.getTokens());
+            ProgramNode program = parser.parseProgram();
+            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program);
 
-        Tokenizer tokenizer = new Tokenizer(source);
-        Parser parser = new Parser(tokenizer.getTokens());
-        ProgramNode program = parser.parseProgram();
-        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program);
+        }catch(ArchMagi e){
+            System.out.println(e.getMessage());            
+        }
         
-} catch (IOException e) {
+        } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
     }

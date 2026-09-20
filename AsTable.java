@@ -90,7 +90,7 @@ public class AsTable {
 	EQUALS,
 	TK_GREATER,
 	TK_SYMBOL,
-	-1,
+	TK_SYMBOL,
 	LETTER,
 	LETTER,
 	LETTER,

@@ -1,2 +1,4 @@
-# Comments #
-Rune x=5 > 3;
+#Comments#
+# Second #
+
+Spell Hello = "@dkfjs";
