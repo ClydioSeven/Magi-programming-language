@@ -89,59 +89,59 @@ public class Parser {
 
         Token token = peek();
 
-        return switch (token.getType()) {
+         switch (token.getType()) {
 
-            case RUNE ->
-                parseIntDeclaration();
+            case RUNE:
+                return parseIntDeclaration();
 
-            case GLYPH ->
-                parseDoubleDeclaration();
+            case GLYPH:
+                return parseDoubleDeclaration();
 
-            case SIGIL ->
-                parseBooleanDeclaration();
+            case SIGIL:
+                return parseBooleanDeclaration();
 
-            case IDENTIFIER ->
-                parseIdentifierStatement();
+            case IDENTIFIER:
+                return parseIdentifierStatement();
 
-            default ->
+            default:
                 throw new ArchMagi(
                         "Unexpected token: " + token);
-        };
+        }
     }
 
     private Statement parseIdentifierStatement() {
     Token next = peek(1);
-    return switch (next.getType()) {
-        case EQUALS ->
-            parseAssignment();
+     switch (next.getType()) {
+        case EQUALS:
+            return parseAssignment();
 
-        case PLUS_PLUS ->
-            parseIncrement();
+        case PLUS_PLUS:
+            return parseIncrement();
 
-        case MINUS_MINUS ->
-            parseDecrement();
+        case MINUS_MINUS:
+            return parseDecrement();
 
-        default ->
+        default:
             throw new ArchMagi(
                 "Unexpected token after identifier: " + next);
-    };
+        }
     }
     private Statement parseIdentifierStatementFor() {
     Token next = peek(1);
-    return switch (next.getType()) {
-        case EQUALS ->
-            parseAssignmentFor();
+     switch (next.getType()) {
+        case EQUALS:
+            return parseAssignmentFor();
 
-        case PLUS_PLUS ->
-            parseIncrementFor();
+        case PLUS_PLUS:
+            return parseIncrementFor();
 
-        case MINUS_MINUS ->
-            parseDecrementFor();
+        case MINUS_MINUS:
+            return parseDecrementFor();
 
-        default ->
+        default:
             throw new ArchMagi(
                 "Unexpected token after identifier: " + next);
-    };
+    }
     }
 
     private Statement parseDecrement() {
@@ -257,24 +257,23 @@ public class Parser {
     private Expression parseTermTail(Expression LeftExpression) {
         Token next = peek();
         switch (next.getType()) {
-            case MULTIPLY -> {
+            case MULTIPLY:{
                 consume(TokenType.MULTIPLY);
                     Expression right = parseFactor();
                     Expression combined = new BinaryOperationNode(LeftExpression, TokenType.MULTIPLY, right);
                 return parseTermTail(combined);
-                }
-            case DIVIDE -> {
+            }
+            case DIVIDE:{
                 consume(TokenType.DIVIDE);
                     Expression right = parseFactor();
                     Expression combined = new BinaryOperationNode(LeftExpression, TokenType.DIVIDE, right);
                 return parseTermTail(combined);
             }
-            case MODULO -> {
+            case MODULO:{
                 consume(TokenType.MODULO);
                     Expression right = parseFactor();
                     Expression combined = new BinaryOperationNode(LeftExpression, TokenType.MODULO, right);
                 return parseTermTail(combined);
-                
             }
         }
         return LeftExpression;
@@ -354,25 +353,25 @@ public class Parser {
     private Expression parseComparisonTail(Expression leftExpression) {
         Token next = peek();
         switch (next.getType()) {
-            case LESS_THAN -> {
+            case LESS_THAN: {
                 consume(TokenType.LESS_THAN);
                 Expression right = parseAdditiveExpression();
                 Expression combined = new BinaryOperationNode(leftExpression, TokenType.LESS_THAN, right);
                 return parseComparisonTail(combined);
             }
-            case LESS_EQUAL -> {
+            case LESS_EQUAL: {
                 consume(TokenType.LESS_EQUAL);
                 Expression right = parseAdditiveExpression();
                 Expression combined = new BinaryOperationNode(leftExpression, TokenType.LESS_EQUAL, right);
                 return parseComparisonTail(combined);
             }
-            case GREATER_THAN -> {
+            case GREATER_THAN: {
                 consume(TokenType.GREATER_THAN);
                 Expression right = parseAdditiveExpression();
                 Expression combined = new BinaryOperationNode(leftExpression, TokenType.GREATER_THAN, right);
                 return parseComparisonTail(combined);
             }
-            case GREATER_EQUAL -> {
+            case GREATER_EQUAL: {
                 consume(TokenType.GREATER_EQUAL);
                 Expression right = parseAdditiveExpression();
                 Expression combined = new BinaryOperationNode(leftExpression, TokenType.GREATER_EQUAL, right);
@@ -385,13 +384,13 @@ public class Parser {
     private Expression parseEqualityTail(Expression leftExpression) {
         Token next = peek();
         switch (next.getType()) {
-            case EQUALS_EQUALS -> {
+            case EQUALS_EQUALS: {
                 consume(TokenType.EQUALS_EQUALS);
                 Expression right = parseComparisonExpression();
                 Expression combined = new BinaryOperationNode(leftExpression, TokenType.EQUALS_EQUALS, right);
                 return parseEqualityTail(combined);
             }
-            case NOT_EQUAL ->{
+            case NOT_EQUAL: {
                 consume(TokenType.NOT_EQUAL);
                 Expression right = parseComparisonExpression();
                 Expression combined = new BinaryOperationNode(leftExpression, TokenType.NOT_EQUAL, right);
@@ -456,21 +455,21 @@ public class Parser {
         }
         consume(TokenType.RIGHT_BRACE);
         if(!isAtEnd()){
-           if (peek().getType() == TokenType.ELSE) {
-           if(peek(1).getType() == TokenType.LEFT_BRACE){
-            consume(TokenType.ELSE);
-            consume(TokenType.LEFT_BRACE);
-            while (peek().getType() != TokenType.RIGHT_BRACE) {
-                elseBranch.add(parseStatement());
+            if (peek().getType() == TokenType.ELSE) {
+                if(peek(1).getType() == TokenType.LEFT_BRACE){
+                    consume(TokenType.ELSE);
+                    consume(TokenType.LEFT_BRACE);
+                    while (peek().getType() != TokenType.RIGHT_BRACE) {
+                        elseBranch.add(parseStatement());
+                    }
+                consume(TokenType.RIGHT_BRACE);
+                }
+            else if(peek(1).getType() == TokenType.WARD){
+                consume(TokenType.ELSE);
+                elseBranch.add(parseIf());
             }
-            consume(TokenType.RIGHT_BRACE);
-        }else if(peek(1).getType() == TokenType.WARD){
-            consume(TokenType.ELSE);
-            elseBranch.add(parseIf());
+            } 
         }
-        } 
-        }
-        
         return new IfNode(condition,thenBranch,elseBranch);  
     }
 
@@ -536,13 +535,9 @@ public class Parser {
     private Statement parseIntDeclaration() {
         consume(TokenType.RUNE);
         Token identifier = consume(TokenType.IDENTIFIER);
-
         consume(TokenType.EQUALS);
-
         Expression number = parseExpression();
-
         consume(TokenType.SEMICOLON);
-
         return new IntCreateNode(
             identifier.getValue(),
             number

@@ -23,99 +23,149 @@ public class SemanticAnalyzer {
                 AssignmentNode assignment = (AssignmentNode)statement;
                 if(declared(assignment.getIdentifier())){
                     analyze(assignment.getValue(),symbolTable.get(assignment.getIdentifier()));
+                    break;
                 }
-                else{
-                    throw new ArchMagi("Variable: "+assignment.getIdentifier()+" not declared");
-                }
+                throw new ArchMagi("Variable: "+assignment.getIdentifier()+" not declared");
             case BooleanCreateNode:
             case DoubleCreateNode:
             case IntCreateNode:
             case StringCreateNode:
                 Declaration declaration = (Declaration)statement;
+                if(declared(declaration.getIdentifier()))
+                    throw new ArchMagi("Variable: "+declaration.getIdentifier()+" already declared.");
                 analyze(declaration.getValue(),declaration.getType());
+                symbolTable.put(declaration.getIdentifier(),declaration.getType());
+                break;
             case ForNode:
                 ForNode forNode = (ForNode) statement;
                 analyze(forNode.getInitialization()) ;
                 analyze(forNode.getCondition(),TokenType.SIGIL) ;
                 analyze(forNode.getIncrement()) ;
                 analyzeList(forNode.getBody());
+                break;
             case IfNode:
                 IfNode ifNode = (IfNode) statement;
                 analyze(ifNode.getCondition(),TokenType.SIGIL);
                 analyzeList(ifNode.getThenBranch()) ;
                 analyzeList(ifNode.getElseBranch());
+                break;
             case PrintNode:
                 PrintNode printNode = (PrintNode) statement;
-                analyze(printNode.getExpression(),TokenType.CAST);
+                traverse(printNode.getExpression());
+                break;
             case WhileNode:
                 WhileNode whileNode = (WhileNode) statement;
                 analyze(whileNode.getCondition(),TokenType.SIGIL);
                 analyzeList(whileNode.getBody());
+                break;
             default:
                 System.out.println("Unknown error");
         }
     }
     private boolean declared(String string){
-        if(symbolTable.containsKey(string))
-            return true;
-        return false;
+        return symbolTable.containsKey(string);
     }
 
-    private boolean analyze(Expression expression, TokenType Token){
-        switch(Token){
-            case RUNE:
-            case GLYPH:
-                return traverse(expression) == TokenType.RUNE || traverse(expression) == TokenType.GLYPH;
-            default:
-                return traverse(expression) == Token ;
+    private void analyze(Expression expression, TokenType expected){
+        TokenType real = traverse(expression);
+        if(real !=expected){
+            if(!bothNumeric(real,expected))
+                throw new ArchMagi("Expected: "+expected+" received: "+real);
         }
-
     }
     private TokenType traverse(Expression expression){
         switch(expression.getExpressionType()){
             case IntLiteralNode:
-                IntLiteralNode intLiteralNode = (IntLiteralNode) expression;
-                System.out.println("IntLiteralNode: " + intLiteralNode.getValue());
                 return TokenType.RUNE;
             case StringLiteralNode:
-                StringLiteralNode stringLiteralNode = (StringLiteralNode) expression;
-                System.out.println("StringLiteralNode: " + stringLiteralNode.getValue());
-                return TokenType.RUNE;
+                return TokenType.SPELL;
             case BooleanLiteralNode:
-                BooleanLiteralNode booleanLiteralNode = (BooleanLiteralNode) expression;
-                System.out.println("BooleanLiteralNode: " + booleanLiteralNode.getValue());
-                return TokenType.RUNE;
+                return TokenType.SIGIL;
             case DoubleLiteralNode:
-                DoubleLiteralNode doubleLiteralNode = (DoubleLiteralNode) expression;
-                System.out.println("DoubleLiteralNode: " + doubleLiteralNode.getValue());
-                return TokenType.RUNE;
+                return TokenType.GLYPH;
             case IdentifierNode:
                 IdentifierNode identifierNode = (IdentifierNode) expression;
-                if(symbolTable.containsKey(identifierNode.getIdentifier())){
-                    System.out.println("Valid IdentifierNode: " + identifierNode.getIdentifier());
-                }else{
-                    System.out.println("Invalid IdentifierNode: " + identifierNode.getIdentifier());
+                if(!declared(identifierNode.getIdentifier())){
+                    throw new ArchMagi("Identifier: "+identifierNode.getIdentifier()+ " not declared.");
                 }
-                
-                return TokenType.RUNE;
+                return symbolTable.get(identifierNode.getIdentifier());
             case BinaryOperationNode:
                 BinaryOperationNode binaryOperationNode = (BinaryOperationNode) expression;
                 System.out.println("BinaryExpressionNode: " + binaryOperationNode.getOperator());
-                traverse(binaryOperationNode.getRight());
-                traverse(binaryOperationNode.getLeft());
-                
-                return TokenType.RUNE;
+                TokenType left = traverse(binaryOperationNode.getLeft());
+                TokenType right = traverse(binaryOperationNode.getRight());
+                TokenType Operator = binaryOperationNode.getOperator();
+                return checkTokenType(Operator, left, right);
             case UnaryOperationNode:
                 UnaryOperationNode unaryOperationNode = (UnaryOperationNode) expression;
-                System.out.println("UnaryExpressionNode: " + unaryOperationNode.getOperator());
-                traverse(unaryOperationNode.getOperand());
-                return TokenType.RUNE;
+                TokenType token = traverse(unaryOperationNode.getOperand());
+                return checkUnary(unaryOperationNode.getOperator(),token);
             default:
-                System.out.println("Unknown expression type: " + expression.getClass().getSimpleName());
-                return TokenType.RUNE;
+                throw new ArchMagi("Invalid expression");
+            }
+        }
+        private TokenType checkTokenType(TokenType Op, TokenType left, TokenType right){
+            switch(Op){
+                case PLUS:
+                    if(eitherisString(left,right))
+                        return TokenType.SPELL;
+                case MINUS:
+                case MULTIPLY:
+                case DIVIDE:
+                case MODULO:
+                    if(bothNumeric(left,right)) 
+                        return NumTable(left, right);
+                    throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);
+                case LESS_THAN:
+                case LESS_EQUAL:
+                case GREATER_THAN:
+                case GREATER_EQUAL:
+                    if(bothNumeric(left,right))
+                        return TokenType.SIGIL;
+                    throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);
+                case NOT_EQUAL:
+                case EQUALS_EQUALS:
+                    if(left == right||bothNumeric(left, right))
+                        return TokenType.SIGIL;    
+                case AMPAMP:
+                case VERTBARBAR:
+                    if(bothBoolean(left,right))
+                        return TokenType.SIGIL;
+
+                default:
+                    throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);    
+            }
+        }
+    private TokenType checkUnary(TokenType Op, TokenType token){
+        switch(Op){
+            case MINUS:
+                if(isNumeric(token))
+                     return token;
+                throw new ArchMagi("Illegal expression: "+Op+" "+token);
+            case NOT:
+                if(token==TokenType.SIGIL)
+                    return token;
+            default:
+                throw new ArchMagi("Illegal expression: "+Op+" "+token);
         }
     }
+    private boolean eitherisString(TokenType left, TokenType right){
+        return left == TokenType.SPELL || right==TokenType.SPELL;     
+    }
+    private boolean bothBoolean(TokenType left, TokenType right){
+        return left == TokenType.SIGIL && right == TokenType.SIGIL;
+    }
+    private boolean bothNumeric(TokenType left, TokenType right){
+        return isNumeric(left)&&isNumeric(right);
+    }
+    private boolean isNumeric(TokenType token){
+        return token == TokenType.RUNE || token == TokenType.GLYPH;
+    }
+    private TokenType NumTable(TokenType left, TokenType right){
+        if(left == TokenType.RUNE && right==TokenType.RUNE){
+            return TokenType.RUNE;
+        }
+        return TokenType.GLYPH;
+    }  
     
-
-
 }

@@ -28,23 +28,21 @@ public class Token {
 
     @Override
     public String toString() {
+         switch(type) {
+            case IDENTIFIER:
+                return "[IDENTIFIER: " + value + "]";
 
-        return switch(type) {
+            case INTEGER:
+                return "[INTEGER: " + value + "]";
 
-            case IDENTIFIER ->
-                "[IDENTIFIER: " + value + "]";
+            case DOUBLE:
+                return "[DOUBLE: " + value + "]";
 
-            case INTEGER ->
-                "[INTEGER: " + value + "]";
+            case STRING:
+                return "[STRING: " + value + "]";
 
-            case DOUBLE ->
-                "[DOUBLE: " + value + "]";
-
-            case STRING ->
-                "[STRING: " + value + "]";
-
-            default ->
-                "[" + type + "]";
-        };
+            default:
+                return "[" + type + "]";
+        }
     }
 }
