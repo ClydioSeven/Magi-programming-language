@@ -265,7 +265,7 @@ public class Tokenizer {
         return new Token(TokenType.MODULO, lexeme);
 
     case -99:
-        throw new RuntimeException("Invalid character: " + lexeme);
+        throw new ArchMagi("Invalid character: " + lexeme);
 }
 
         return null;
