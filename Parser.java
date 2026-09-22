@@ -85,6 +85,37 @@ public class Parser {
                         "Unexpected token: " + token);
         }
     }
+    private Statement parseStatementLoop() {
+
+        Token token = peek();
+
+        switch (token.getType()) {
+            case RUNE:
+            case GLYPH:
+            case SPELL:
+            case SIGIL:
+                throw new ArchMagi("Semantic error: Variable declaration inside a loop.");
+
+            case CAST:
+                return parsePrint();
+
+            case CHANT:
+                return parseWhile();
+
+            case WARD:
+                return parseIf();
+
+            case BARRAGE:
+                return parseFor();
+
+            case IDENTIFIER:
+                return parseIdentifierStatement();
+
+            default:
+                throw new ArchMagi(
+                        "Unexpected token: " + token);
+        }
+    }
     private Statement parseStatementFor() {
 
         Token token = peek();
@@ -435,7 +466,7 @@ public class Parser {
         consume(TokenType.LEFT_BRACE);
         List<Statement> body = new ArrayList<>();
         while (peek().getType() != TokenType.RIGHT_BRACE) {
-            body.add(parseStatement());
+            body.add(parseStatementLoop());
         }
         consume(TokenType.RIGHT_BRACE);
         return new ForNode(initialization, condition, increment, body);
@@ -481,7 +512,7 @@ public class Parser {
         consume(TokenType.LEFT_BRACE);
         List<Statement> body = new ArrayList<>();
         while (peek().getType() != TokenType.RIGHT_BRACE) {
-            body.add(parseStatement());
+            body.add(parseStatementLoop());
         }
         consume(TokenType.RIGHT_BRACE);
         return new WhileNode(condition, body);

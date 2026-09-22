@@ -38,10 +38,11 @@ public class SemanticAnalyzer {
                 break;
             case ForNode:
                 ForNode forNode = (ForNode) statement;
-                analyze(forNode.getInitialization()) ;
+                analyze(forNode.getInitialization());
                 analyze(forNode.getCondition(),TokenType.SIGIL) ;
                 analyze(forNode.getIncrement()) ;
                 analyzeList(forNode.getBody());
+                symbolTable.remove(analyzeFor(forNode.getInitialization()));
                 break;
             case IfNode:
                 IfNode ifNode = (IfNode) statement;
@@ -59,8 +60,12 @@ public class SemanticAnalyzer {
                 analyzeList(whileNode.getBody());
                 break;
             default:
-                System.out.println("Unknown error");
+                throw new ArchMagi("Unknown error");
         }
+    }
+    private String analyzeFor(Statement statement){
+        Declaration declaration = (Declaration)statement;
+        return declaration.getIdentifier();
     }
     private boolean declared(String string){
         return symbolTable.containsKey(string);
@@ -91,7 +96,6 @@ public class SemanticAnalyzer {
                 return symbolTable.get(identifierNode.getIdentifier());
             case BinaryOperationNode:
                 BinaryOperationNode binaryOperationNode = (BinaryOperationNode) expression;
-                System.out.println("BinaryExpressionNode: " + binaryOperationNode.getOperator());
                 TokenType left = traverse(binaryOperationNode.getLeft());
                 TokenType right = traverse(binaryOperationNode.getRight());
                 TokenType Operator = binaryOperationNode.getOperator();

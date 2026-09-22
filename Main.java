@@ -15,7 +15,6 @@ public class Main {
             .replace("\r", "\n");
         try {
             Tokenizer tokenizer = new Tokenizer(source);
-            System.out.println(tokenizer.getTokens());
             Parser parser = new Parser(tokenizer.getTokens());
             ProgramNode program = parser.parseProgram();
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program);
