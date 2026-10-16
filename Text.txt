@@ -1,5 +1,4 @@
 #Comments#
 # Second #
 
-Spell Fireball = "Fireball";
-Cast(Fireball);
+Glyph x =5.5;

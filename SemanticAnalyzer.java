@@ -170,6 +170,7 @@ public class SemanticAnalyzer {
             return TokenType.RUNE;
         }
         return TokenType.GLYPH;
-    }  
+    }
     
 }
+

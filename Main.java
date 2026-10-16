@@ -18,7 +18,7 @@ public class Main {
             Parser parser = new Parser(tokenizer.getTokens());
             ProgramNode program = parser.parseProgram();
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program);
-
+            Writer writer = new Writer(program.getStatements());
         }catch(ArchMagi e){
             System.out.println(e.getMessage());            
         }

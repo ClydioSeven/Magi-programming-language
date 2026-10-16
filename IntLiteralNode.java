@@ -1,11 +1,11 @@
 public class IntLiteralNode implements Expression {
-    private final Integer value;
+    private final long value;
 
-    public IntLiteralNode(Integer value) {
+    public IntLiteralNode(long value) {
         this.value = value;
     }
 
-    public Integer getValue() {
+    public Long getValue() {
         return value;
     }
     public ExpressionType getExpressionType(){

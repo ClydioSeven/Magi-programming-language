@@ -131,9 +131,6 @@ public class Parser {
             case SIGIL:
                 return parseBooleanDeclaration();
 
-            case IDENTIFIER:
-                return parseIdentifierStatement();
-
             default:
                 throw new ArchMagi(
                         "Unexpected token: " + token);
@@ -315,15 +312,27 @@ public class Parser {
         switch (next.getType()) {
             case INTEGER: 
                 consume(TokenType.INTEGER);
-                return new IntLiteralNode(
-                    Integer.parseInt(next.getValue())
-                );
-            
+                try{
+                    return new IntLiteralNode(
+                    Long.parseLong(next.getValue())
+                    );
+                }catch(NumberFormatException e){
+                    throw new ArchMagi("Long value out of range: " + next.getValue());
+                }
             case DOUBLE:
                 consume(TokenType.DOUBLE);
-                return new DoubleLiteralNode(
-                    Double.parseDouble(next.getValue())
-                );            
+                try {
+                    double value = Double.parseDouble(next.getValue());
+
+                    if (!Double.isFinite(value)) {
+                        throw new ArchMagi("Double value out of range: " + next.getValue());
+                    }
+
+                    return new DoubleLiteralNode(value);
+
+                } catch (NumberFormatException e) {
+                    throw new ArchMagi("Invalid double value: " + next.getValue());
+                }      
             
             case STRING: 
                 consume(TokenType.STRING);
