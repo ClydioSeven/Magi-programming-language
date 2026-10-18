@@ -108,38 +108,38 @@ public class SemanticAnalyzer {
                 throw new ArchMagi("Invalid expression");
             }
         }
-        private TokenType checkTokenType(TokenType Op, TokenType left, TokenType right){
-            switch(Op){
-                case PLUS:
-                    if(eitherisString(left,right))
-                        return TokenType.SPELL;
-                case MINUS:
-                case MULTIPLY:
-                case DIVIDE:
-                case MODULO:
-                    if(bothNumeric(left,right)) 
-                        return NumTable(left, right);
-                    throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);
-                case LESS_THAN:
-                case LESS_EQUAL:
-                case GREATER_THAN:
-                case GREATER_EQUAL:
-                    if(bothNumeric(left,right))
-                        return TokenType.SIGIL;
-                    throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);
-                case NOT_EQUAL:
-                case EQUALS_EQUALS:
-                    if(left == right||bothNumeric(left, right))
-                        return TokenType.SIGIL;    
-                case AMPAMP:
-                case VERTBARBAR:
-                    if(bothBoolean(left,right))
-                        return TokenType.SIGIL;
+    private TokenType checkTokenType(TokenType Op, TokenType left, TokenType right){
+        switch(Op){
+            case PLUS:
+                if(eitherisString(left,right))
+                    return TokenType.SPELL;
+            case MINUS:
+            case MULTIPLY:
+            case DIVIDE:
+            case MODULO:
+                if(bothNumeric(left,right)) 
+                    return NumTable(left, right);
+                throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);
+            case LESS_THAN:
+            case LESS_EQUAL:
+            case GREATER_THAN:
+            case GREATER_EQUAL:
+                if(bothNumeric(left,right))
+                    return TokenType.SIGIL;
+                throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);
+            case NOT_EQUAL:
+            case EQUALS_EQUALS:
+                if(left == right||bothNumeric(left, right))
+                    return TokenType.SIGIL;    
+            case AMPAMP:
+            case VERTBARBAR:
+                if(bothBoolean(left,right))
+                    return TokenType.SIGIL;
 
-                default:
-                    throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);    
-            }
+            default:
+                throw new ArchMagi("Illegal expression: "+left+" "+Op+" "+right);    
         }
+    }
     private TokenType checkUnary(TokenType Op, TokenType token){
         switch(Op){
             case MINUS:
