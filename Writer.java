@@ -6,6 +6,7 @@ public class Writer {
     private final List<Statement> program;
     private final ByteArrayOutputStream code = new ByteArrayOutputStream();
     private final Map<String, Integer> variableOffsets = new HashMap<>();
+    private HashMap<String,VariableInfo> variables = new HashMap<>();
     private int stackOffset = 0;
 
     public Writer(List<Statement> program) {
@@ -29,24 +30,33 @@ public class Writer {
                 break;
 
             case IntCreateNode:{
+                IntCreateNode node = (IntCreateNode)statement;
                 Number value = getValue(((IntCreateNode) statement).getValue());
-                System.out.println(value.longValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.RUNE,value.longValue()));
                 break;
             }
             case DoubleCreateNode:{
+                DoubleCreateNode node = (DoubleCreateNode)statement;
                 Number value = getValue(((DoubleCreateNode) statement).getValue());
-                System.out.println(value.doubleValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.GLYPH,value.doubleValue()));
                 break;
             }
 
-            case BooleanCreateNode:
+            case BooleanCreateNode:{
                 System.out.println(evaluateBoolean(((BooleanCreateNode) statement).getValue()));
+                BooleanCreateNode node  = (BooleanCreateNode)statement;
+                Boolean value = evaluateBoolean(node.getValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.SIGIL,value.booleanValue()));
+
                 break;
+            }
             case IfNode:
                 IfNode ifNode = (IfNode)statement;
                 Expression ifCondition = ifNode.getCondition();
-                List<statement> thenBranch = ifNode.getThenBranch();
-                List<statement> elseBranch = ifNode.getElseBranch();
+                List<Statement> thenBranch = ifNode.getThenBranch();
+                List<Statement> elseBranch = ifNode.getElseBranch();
+                Boolean cond = evaluateBoolean(ifCondition);
+                break;
             default:
                 throw new ArchMagi("Unsupported statement: "
                         + statement.getStatementType());
@@ -132,6 +142,7 @@ public class Writer {
         }
     }
     private TokenType traverse(Expression expression){
+        System.out.println(expression.getExpressionType());
         switch(expression.getExpressionType()){
             case IntLiteralNode:
                 return TokenType.RUNE;
@@ -141,10 +152,10 @@ public class Writer {
                 return TokenType.SIGIL;
             case DoubleLiteralNode:
                 return TokenType.GLYPH;
-                /* TBD
             case IdentifierNode:
-                break
-                */
+                IdentifierNode identifierNode = (IdentifierNode)expression;
+                VariableInfo info = variables.get(identifierNode.getIdentifier());
+                return info.getType();
             case BinaryOperationNode:
                 BinaryOperationNode binaryOperationNode = (BinaryOperationNode) expression;
                 TokenType left = traverse(binaryOperationNode.getLeft());
@@ -263,6 +274,8 @@ public class Writer {
                             return left.longValue() * right.longValue();
                         case DIVIDE:
                             return left.longValue() / right.longValue();
+                        case MODULO:
+                        return left.longValue() % right.longValue();
                         default:
                             throw new ArchMagi("Unknown numeric operator");
                     }
@@ -277,10 +290,16 @@ public class Writer {
                         return left.doubleValue() * right.doubleValue();
                     case DIVIDE:
                         return left.doubleValue() / right.doubleValue();
+                    case MODULO:
+                        return left.doubleValue() % right.doubleValue();
                     default:
                         throw new ArchMagi("Unknown numeric operator");
                 }
-
+            case IdentifierNode:{
+                IdentifierNode node = (IdentifierNode)expression;
+                VariableInfo info = variables.get(node.getIdentifier());
+                return (Number)info.getKnownValue();
+            }
             default:
                 throw new ArchMagi("Unsupported numeric expression: "+ expression.getExpressionType()
             );

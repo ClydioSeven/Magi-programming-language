@@ -1,7 +1,7 @@
 #Comments#
 # Second #
 
-Rune x=2;
+Glyph x=2.0;
 Ward(x%2==0){
-    
+
 }
