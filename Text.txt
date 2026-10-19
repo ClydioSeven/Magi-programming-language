@@ -1,7 +1,5 @@
 #Comments#
 # Second #
 
-Glyph x=2.0;
-Ward(x%2==0){
-
-}
+Rune x = 5;
+x=x+x+x;

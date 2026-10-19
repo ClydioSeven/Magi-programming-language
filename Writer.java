@@ -16,7 +16,7 @@ public class Writer {
 
     public byte[] generateProgram() {
         for (Statement statement : program) {
-            System.out.println("Generated code for statement: " + statement.getStatementType());
+            //System.out.println("Generated code for statement: " + statement.getStatementType());
             generateCode(statement);
         }
         generateExit();
@@ -25,6 +25,30 @@ public class Writer {
 
     private void generateCode(Statement statement) {
         switch (statement.getStatementType()) {
+            case AssignmentNode:{
+               AssignmentNode node = (AssignmentNode)statement;
+               VariableInfo info = variables.get(node.getIdentifier());
+               switch(info.getType()){
+                    case RUNE:{
+                        Number value = getValue(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.RUNE,value.longValue()));
+                        break;
+                    }
+                    case GLYPH:{
+                        Number value = getValue(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.GLYPH,value.doubleValue()));
+                        break;
+                    }
+                    case SIGIL:{
+                        Boolean value = evaluateBoolean(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.SIGIL,value.booleanValue()));
+                        break;
+                    }
+                    
+               } 
+                break;
+            }
+                
             case PrintNode:
                 generatePrint((PrintNode) statement);
                 break;
@@ -43,7 +67,7 @@ public class Writer {
             }
 
             case BooleanCreateNode:{
-                System.out.println(evaluateBoolean(((BooleanCreateNode) statement).getValue()));
+                //System.out.println(evaluateBoolean(((BooleanCreateNode) statement).getValue()));
                 BooleanCreateNode node  = (BooleanCreateNode)statement;
                 Boolean value = evaluateBoolean(node.getValue());
                 variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.SIGIL,value.booleanValue()));
@@ -63,7 +87,7 @@ public class Writer {
         }
     }
     private boolean evaluateBoolean(Expression expression) {
-        System.out.println(expression.getExpressionType());
+        //System.out.println(expression.getExpressionType());
         switch (expression.getExpressionType()) {
             case BooleanLiteralNode:{
                 return ((BooleanLiteralNode) expression).getValue();
@@ -134,7 +158,7 @@ public class Writer {
             case SPELL:{
                 String left = getString(node.getLeft());
                 String right = getString(node.getRight());
-                System.out.println("left: "+left +" Right: "+right);
+                //System.out.println("left: "+left +" Right: "+right);
                 return left.equals(right);
             }
             default:
@@ -142,7 +166,7 @@ public class Writer {
         }
     }
     private TokenType traverse(Expression expression){
-        System.out.println(expression.getExpressionType());
+        //System.out.println(expression.getExpressionType());
         switch(expression.getExpressionType()){
             case IntLiteralNode:
                 return TokenType.RUNE;
