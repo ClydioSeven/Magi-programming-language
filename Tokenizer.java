@@ -205,7 +205,7 @@ public class Tokenizer {
         return new Token(TokenType.EQUALS_EQUALS, lexeme);
 
     case -11:
-        return new Token(TokenType.STRING, lexeme);
+        return new Token(TokenType.STRING, lexeme.substring(1,lexeme.length()-1));
 
     case -12:
         return new Token(TokenType.LEFT_PAREN, lexeme);

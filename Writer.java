@@ -1,6 +1,6 @@
-import java.util.List;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 public class Writer {
     private final List<Statement> program;
@@ -41,11 +41,23 @@ public class Writer {
                     }
                     case SIGIL:{
                         Boolean value = evaluateBoolean(node.getValue());
-                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.SIGIL,value.booleanValue()));
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.SIGIL,value));
+                        break;
+                    }
+                    case SPELL:{
+                        String value = getString(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.SPELL,value));
                         break;
                     }
                     
                } 
+                break;
+            }
+            case StringCreateNode:{
+                StringCreateNode node = (StringCreateNode)statement;
+                String value = getString(node.getValue());
+                variables.put(node.getIdentifier(),new VariableInfo(stackOffset+8,TokenType.SPELL,value));
+                System.out.println(value);
                 break;
             }
                 
@@ -55,13 +67,14 @@ public class Writer {
 
             case IntCreateNode:{
                 IntCreateNode node = (IntCreateNode)statement;
-                Number value = getValue(((IntCreateNode) statement).getValue());
+                Number value = getValue(node.getValue());
                 variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.RUNE,value.longValue()));
+                System.out.println(value);
                 break;
             }
             case DoubleCreateNode:{
                 DoubleCreateNode node = (DoubleCreateNode)statement;
-                Number value = getValue(((DoubleCreateNode) statement).getValue());
+                Number value = getValue(node.getValue());
                 variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.GLYPH,value.doubleValue()));
                 break;
             }
@@ -74,13 +87,27 @@ public class Writer {
 
                 break;
             }
-            case IfNode:
+            case IfNode:{
                 IfNode ifNode = (IfNode)statement;
                 Expression ifCondition = ifNode.getCondition();
                 List<Statement> thenBranch = ifNode.getThenBranch();
                 List<Statement> elseBranch = ifNode.getElseBranch();
                 Boolean cond = evaluateBoolean(ifCondition);
+            }
                 break;
+            case ForNode:{
+                ForNode node = (ForNode)statement;
+                Statement init = node.getInitialization();
+                Expression cond = node.getCondition();
+                List<Statement> body = node.getBody();
+                Boolean active = evaluateBoolean(cond);
+            }
+                break;
+            case WhileNode:{
+                WhileNode node = (WhileNode)statement;
+                Boolean cond = evaluateBoolean(node.getCondition());
+                List<Statement> body = node.getBody();
+            }
             default:
                 throw new ArchMagi("Unsupported statement: "
                         + statement.getStatementType());
@@ -207,9 +234,16 @@ public class Writer {
                 String left =getString(binaryOperationNode.getLeft());
                 String right=getString(binaryOperationNode.getRight());
                 return left+right;
+            case IdentifierNode:{
+                IdentifierNode node = (IdentifierNode)expression;
+                VariableInfo info = variables.get(node.getIdentifier());
+                return info.getKnownValue().toString();
+            }
+            default:
+                throw new ArchMagi("getString error");
+                
 
         }
-        return "";
     }
     private TokenType checkUnary(TokenType Op, TokenType token){
         switch(Op){
