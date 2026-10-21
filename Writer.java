@@ -57,7 +57,7 @@ public class Writer {
                 StringCreateNode node = (StringCreateNode)statement;
                 String value = getString(node.getValue());
                 variables.put(node.getIdentifier(),new VariableInfo(stackOffset+8,TokenType.SPELL,value));
-                System.out.println(value);
+                //System.out.println(value);
                 break;
             }
                 
@@ -110,6 +110,7 @@ public class Writer {
                 WhileNode node = (WhileNode)statement;
                 Boolean cond = evaluateBoolean(node.getCondition());
                 List<Statement> body = node.getBody();
+                
             }
             default:
                 throw new ArchMagi("Unsupported statement: "
@@ -125,6 +126,16 @@ public class Writer {
             case BinaryOperationNode:{
                 BinaryOperationNode node = (BinaryOperationNode) expression;
                 switch (node.getOperator()) {
+                    case VERTBARBAR:{
+                        boolean left = evaluateBoolean(node.getLeft());
+                        boolean right=evaluateBoolean(node.getRight());
+                        return left || right;
+                    }
+                    case AMPAMP:{
+                        boolean left = evaluateBoolean(node.getLeft());
+                        boolean right = evaluateBoolean(node.getRight());
+                        return left && right;
+                    }
                     case EQUALS_EQUALS:{
                         return getEqualEqual(node);
                     }
@@ -162,6 +173,11 @@ public class Writer {
             case UnaryOperationNode:{
                 boolean node = evaluateBoolean(((UnaryOperationNode) expression).getOperand());
                 return !node;
+            }
+            case IdentifierNode:{
+                IdentifierNode node = (IdentifierNode)expression;
+                VariableInfo info = variables.get(node.getIdentifier());
+                return (Boolean)info.getKnownValue();
             }
 
             default:
@@ -225,27 +241,31 @@ public class Writer {
         }
     }
     private String getString(Expression expression){
-        switch(expression.getExpressionType()){
-            case IntLiteralNode:
-                return String.valueOf(((IntLiteralNode) expression).getValue());
-            case DoubleLiteralNode:
-                return String.valueOf(((DoubleLiteralNode) expression).getValue());
-            case StringLiteralNode:
-                return ((StringLiteralNode) expression).getValue();
-            case BinaryOperationNode:
-                BinaryOperationNode binaryOperationNode = (BinaryOperationNode)expression;
-                String left =getString(binaryOperationNode.getLeft());
-                String right=getString(binaryOperationNode.getRight());
-                return left+right;
-            case IdentifierNode:{
-                IdentifierNode node = (IdentifierNode)expression;
-                VariableInfo info = variables.get(node.getIdentifier());
-                return info.getKnownValue().toString();
-            }
+        switch(traverse(expression)){
+            case RUNE:
+            case GLYPH:
+                return String.valueOf(getValue(expression));
+            case SPELL:
+                switch(expression.getExpressionType()){
+                    case StringLiteralNode:{
+                        return ((StringLiteralNode)expression).getValue();
+                    }
+                    case IdentifierNode:{
+                        IdentifierNode node = (IdentifierNode)expression;
+                        VariableInfo info = variables.get(node.getIdentifier());
+                        return (String)info.getKnownValue();
+                    }
+                    case BinaryOperationNode:{
+                        BinaryOperationNode node = (BinaryOperationNode)expression;
+                        return getString(node.getLeft())+getString(node.getRight());
+                    }
+                    default:
+                        throw new ArchMagi("Unsupported string expression");
+                } 
+            case SIGIL:
+                return String.valueOf(evaluateBoolean(expression));
             default:
                 throw new ArchMagi("getString error");
-                
-
         }
     }
     private TokenType checkUnary(TokenType Op, TokenType token){

@@ -1,3 +1,6 @@
 #Comments#
 # Second #
 
+Chant(3<5){
+    Cast("lol");
+}
