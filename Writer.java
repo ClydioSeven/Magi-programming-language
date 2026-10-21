@@ -61,15 +61,18 @@ public class Writer {
                 break;
             }
                 
-            case PrintNode:
-                generatePrint((PrintNode) statement);
+            case PrintNode:{
+                PrintNode node = (PrintNode)statement;
+                String value = getString(node.getExpression());
+                System.out.println(value);
                 break;
+            }
 
             case IntCreateNode:{
                 IntCreateNode node = (IntCreateNode)statement;
                 Number value = getValue(node.getValue());
                 variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.RUNE,value.longValue()));
-                System.out.println(value);
+                //System.out.println(value);
                 break;
             }
             case DoubleCreateNode:{
