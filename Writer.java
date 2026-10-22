@@ -127,14 +127,11 @@ public class Writer {
                 BinaryOperationNode node = (BinaryOperationNode) expression;
                 switch (node.getOperator()) {
                     case VERTBARBAR:{
-                        boolean left = evaluateBoolean(node.getLeft());
-                        boolean right=evaluateBoolean(node.getRight());
-                        return left || right;
+                        return evaluateBoolean(node.getLeft()) || evaluateBoolean(node.getRight());
                     }
                     case AMPAMP:{
-                        boolean left = evaluateBoolean(node.getLeft());
-                        boolean right = evaluateBoolean(node.getRight());
-                        return left && right;
+                        return evaluateBoolean(node.getLeft()) && evaluateBoolean(node.getRight());
+
                     }
                     case EQUALS_EQUALS:{
                         return getEqualEqual(node);
@@ -354,9 +351,15 @@ public class Writer {
                         case MULTIPLY:
                             return left.longValue() * right.longValue();
                         case DIVIDE:
+                            if(right.longValue() == 0){
+                                throw new ArchMagi("Invalid: Division by 0");
+                            }
                             return left.longValue() / right.longValue();
                         case MODULO:
-                        return left.longValue() % right.longValue();
+                            if(right.longValue() == 0){
+                                throw new ArchMagi("Invalid: Modulo by 0");
+                        }
+                            return left.longValue() % right.longValue();
                         default:
                             throw new ArchMagi("Unknown numeric operator");
                     }
@@ -370,8 +373,14 @@ public class Writer {
                     case MULTIPLY:
                         return left.doubleValue() * right.doubleValue();
                     case DIVIDE:
+                        if(right.doubleValue() == 0){
+                                throw new ArchMagi("Invalid: Division by 0");
+                        }
                         return left.doubleValue() / right.doubleValue();
                     case MODULO:
+                        if(right.doubleValue() == 0){
+                                throw new ArchMagi("Invalid: Modulo by 0");
+                        }
                         return left.doubleValue() % right.doubleValue();
                     default:
                         throw new ArchMagi("Unknown numeric operator");

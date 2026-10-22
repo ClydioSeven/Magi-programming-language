@@ -94,7 +94,7 @@ public class Parser {
             case GLYPH:
             case SPELL:
             case SIGIL:
-                throw new ArchMagi("Semantic error: Variable declaration inside a loop.");
+                throw new ArchMagi("Semantic error: Variable declaration inside a loop or if.");
 
             case CAST:
                 return parsePrint();
@@ -490,8 +490,7 @@ public class Parser {
         List<Statement> thenBranch = new ArrayList<>();
         List<Statement> elseBranch = new ArrayList<>();
         while (peek().getType() != TokenType.RIGHT_BRACE) {
-        
-            thenBranch.add(parseStatement());
+            thenBranch.add(parseStatementLoop());
         }
         consume(TokenType.RIGHT_BRACE);
         if(!isAtEnd()){
@@ -500,7 +499,7 @@ public class Parser {
                     consume(TokenType.ELSE);
                     consume(TokenType.LEFT_BRACE);
                     while (peek().getType() != TokenType.RIGHT_BRACE) {
-                        elseBranch.add(parseStatement());
+                        elseBranch.add(parseStatementLoop());
                     }
                 consume(TokenType.RIGHT_BRACE);
                 }

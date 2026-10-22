@@ -1,4 +1,4 @@
 #Comments#
 # Second #
 
-Cast(5+5);
+Rune x = 5/0;
