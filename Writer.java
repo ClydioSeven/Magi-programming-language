@@ -57,22 +57,12 @@ public class Writer {
                 StringCreateNode node = (StringCreateNode)statement;
                 String value = getString(node.getValue());
                 variables.put(node.getIdentifier(),new VariableInfo(stackOffset+8,TokenType.SPELL,value));
-                //System.out.println(value);
                 break;
             }
-                
-            case PrintNode:{
-                PrintNode node = (PrintNode)statement;
-                String value = getString(node.getExpression());
-                System.out.println(value);
-                break;
-            }
-
             case IntCreateNode:{
                 IntCreateNode node = (IntCreateNode)statement;
                 Number value = getValue(node.getValue());
                 variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.RUNE,value.longValue()));
-                //System.out.println(value);
                 break;
             }
             case DoubleCreateNode:{
@@ -83,27 +73,42 @@ public class Writer {
             }
 
             case BooleanCreateNode:{
-                //System.out.println(evaluateBoolean(((BooleanCreateNode) statement).getValue()));
                 BooleanCreateNode node  = (BooleanCreateNode)statement;
                 Boolean value = evaluateBoolean(node.getValue());
                 variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.SIGIL,value.booleanValue()));
-
                 break;
             }
+
+            case PrintNode:{
+                PrintNode node = (PrintNode)statement;
+                String value = getString(node.getExpression());
+                System.out.println(value);
+                break;
+            }
+
             case IfNode:{
                 IfNode ifNode = (IfNode)statement;
                 Expression ifCondition = ifNode.getCondition();
                 List<Statement> thenBranch = ifNode.getThenBranch();
                 List<Statement> elseBranch = ifNode.getElseBranch();
                 Boolean cond = evaluateBoolean(ifCondition);
-            }
+                iterateBody(thenBranch);
+                iterateBody(elseBranch);
                 break;
+            }
+                
             case ForNode:{
                 ForNode node = (ForNode)statement;
                 Statement init = node.getInitialization();
                 Expression cond = node.getCondition();
                 List<Statement> body = node.getBody();
-                Boolean active = evaluateBoolean(cond);
+                Statement increment = node.getIncrement();
+                
+                generateInit(init);
+                iterateBody(body);
+
+                
+
             }
                 break;
             case WhileNode:{
@@ -116,6 +121,130 @@ public class Writer {
                 throw new ArchMagi("Unsupported statement: "
                         + statement.getStatementType());
         }
+    }
+    private void generateInit(Statement statement){
+        switch (statement.getStatementType()) {
+            case IntCreateNode:{
+                IntCreateNode node = (IntCreateNode)statement;
+                Number value = getValue(node.getValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.RUNE,value.longValue()));
+                break;
+            }
+            case DoubleCreateNode:{
+                DoubleCreateNode node = (DoubleCreateNode)statement;
+                Number value = getValue(node.getValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.GLYPH,value.doubleValue()));
+                break;
+            }
+
+            case BooleanCreateNode:{
+                BooleanCreateNode node  = (BooleanCreateNode)statement;
+                Boolean value = evaluateBoolean(node.getValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.SIGIL,value.booleanValue()));
+                break;
+            }
+            default:
+                throw new ArchMagi("Unexpected For initialization.");
+        }
+    }
+    private void iterateBody(List<Statement> body){
+        for(Statement statement: body){
+            generateCodeFor(statement);
+        }
+    }
+    private void generateCodeFor(Statement statement) {
+        switch (statement.getStatementType()) {
+            case AssignmentNode:{
+               AssignmentNode node = (AssignmentNode)statement;
+               VariableInfo info = variables.get(node.getIdentifier());
+               switch(info.getType()){
+                    case RUNE:{
+                        Number value = getValue(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.RUNE,value.longValue()));
+                        break;
+                    }
+                    case GLYPH:{
+                        Number value = getValue(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.GLYPH,value.doubleValue()));
+                        break;
+                    }
+                    case SIGIL:{
+                        Boolean value = evaluateBoolean(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.SIGIL,value));
+                        break;
+                    }
+                    case SPELL:{
+                        String value = getString(node.getValue());
+                        variables.put(node.getIdentifier(), new VariableInfo(info.getOffset(),TokenType.SPELL,value));
+                        break;
+                    }
+                    
+               } 
+                break;
+            }
+              case IntCreateNode:{
+                IntCreateNode node = (IntCreateNode)statement;
+                Number value = getValue(node.getValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.RUNE,value.longValue()));
+                break;
+            }
+            case DoubleCreateNode:{
+                DoubleCreateNode node = (DoubleCreateNode)statement;
+                Number value = getValue(node.getValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.GLYPH,value.doubleValue()));
+                break;
+            }
+
+            case BooleanCreateNode:{
+                BooleanCreateNode node  = (BooleanCreateNode)statement;
+                Boolean value = evaluateBoolean(node.getValue());
+                variables.put(node.getIdentifier(), new VariableInfo(stackOffset+8,TokenType.SIGIL,value.booleanValue()));
+                break;
+            }
+
+            case PrintNode:{
+                PrintNode node = (PrintNode)statement;
+                String value = getString(node.getExpression());
+                System.out.println(value);
+                break;
+            }
+
+            case IfNode:{
+                IfNode ifNode = (IfNode)statement;
+                Expression ifCondition = ifNode.getCondition();
+                List<Statement> thenBranch = ifNode.getThenBranch();
+                List<Statement> elseBranch = ifNode.getElseBranch();
+                Boolean cond = evaluateBoolean(ifCondition);
+                iterateBody(thenBranch);
+                iterateBody(elseBranch);
+                break;
+            }
+                
+            case ForNode:{
+                ForNode node = (ForNode)statement;
+                Statement init = node.getInitialization();
+                Expression cond = node.getCondition();
+                List<Statement> body = node.getBody();
+                Statement increment = node.getIncrement();
+                
+                generateInit(init);
+                iterateBody(body);
+
+                
+
+            }
+                break;
+            case WhileNode:{
+                WhileNode node = (WhileNode)statement;
+                Boolean cond = evaluateBoolean(node.getCondition());
+                List<Statement> body = node.getBody();
+                
+            }
+            default:
+                throw new ArchMagi("Unsupported statement: "
+                        + statement.getStatementType());
+        }
+            
     }
     private boolean evaluateBoolean(Expression expression) {
         //System.out.println(expression.getExpressionType());
