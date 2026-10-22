@@ -381,6 +381,19 @@ public class Writer {
                 VariableInfo info = variables.get(node.getIdentifier());
                 return (Number)info.getKnownValue();
             }
+            case UnaryOperationNode:{
+                UnaryOperationNode node = (UnaryOperationNode)expression;
+                Number value = getValue(node.getOperand());
+                switch(node.getOperator()){
+                    case MINUS:
+                        if(value instanceof Long){
+                            return -value.longValue();
+                        }
+                        return -value.doubleValue();
+                    default:
+                        throw new ArchMagi("Unsupported numeric unary operator");
+                }
+            }
             default:
                 throw new ArchMagi("Unsupported numeric expression: "+ expression.getExpressionType()
             );
