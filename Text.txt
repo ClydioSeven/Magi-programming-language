@@ -1,12 +1,11 @@
 #Comments#
 # Second #
 
-Rune x = 0;
-
-Barrage (Rune i = 0; i < 5; i++) {
-    Ward (i == 3) {
-        x = x + 10;
-    }
+Sigil x=False;
+Rune y=5;
+Ward(x){
+    y=10;
+}else{
+    y=15;
 }
-
-Cast(x);
+Cast(y);

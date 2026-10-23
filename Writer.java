@@ -92,8 +92,12 @@ public class Writer {
                 List<Statement> thenBranch = ifNode.getThenBranch();
                 List<Statement> elseBranch = ifNode.getElseBranch();
                 Boolean cond = evaluateBoolean(ifCondition);
-                iterateBody(thenBranch);
-                iterateBody(elseBranch);
+                if(cond){
+                    iterateBody(thenBranch);
+                }else{
+                    iterateBody(elseBranch);
+                }
+                
                 break;
             }
                 
