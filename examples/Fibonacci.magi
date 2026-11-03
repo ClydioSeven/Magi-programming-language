@@ -1,0 +1,10 @@
+Rune a=0;
+Rune b=0;
+Rune c=1;
+
+Chant(a<1000){
+    Cast(a+"\n");
+    a = b+c;
+    c = b;
+    b = a;
+}

@@ -16,10 +16,9 @@ public class Writer {
 
     public byte[] generateProgram() {
         for (Statement statement : program) {
-            //System.out.println("Generated code for statement: " + statement.getStatementType());
             generateCode(statement);
         }
-        generateExit();
+        //generateExit();
         return code.toByteArray();
     }
 
@@ -82,7 +81,7 @@ public class Writer {
             case PrintNode:{
                 PrintNode node = (PrintNode)statement;
                 String value = getString(node.getExpression());
-                System.out.println(value);
+                System.out.print(value);
                 break;
             }
 
@@ -101,25 +100,24 @@ public class Writer {
                 break;
             }
                 
-            case ForNode:{
-                ForNode node = (ForNode)statement;
+            case ForNode: {
+                ForNode node = (ForNode) statement;
                 Statement init = node.getInitialization();
-                Expression cond = node.getCondition();
-                List<Statement> body = node.getBody();
-                Statement increment = node.getIncrement();
-                
                 generateInit(init);
-                iterateBody(body);
-
-                
-
-            }
+                while (evaluateBoolean(node.getCondition())) {
+                    iterateBody(node.getBody());
+                    generateCode(node.getIncrement());
+                }
+                variables.remove(analyzeFor(init));
                 break;
-            case WhileNode:{
-                WhileNode node = (WhileNode)statement;
-                Boolean cond = evaluateBoolean(node.getCondition());
-                List<Statement> body = node.getBody();
-                
+            }
+            case WhileNode: {
+                WhileNode node = (WhileNode) statement;
+                while (evaluateBoolean(node.getCondition())) {
+                    iterateBody(node.getBody());
+                }
+
+                break;
             }
             default:
                 throw new ArchMagi("Unsupported statement: "
@@ -151,9 +149,9 @@ public class Writer {
                 throw new ArchMagi("Unexpected For initialization.");
         }
     }
-    private void iterateBody(List<Statement> body){
-        for(Statement statement: body){
-            generateCodeFor(statement);
+    private void iterateBody(List<Statement> body) {
+        for (Statement statement : body) {
+            generateCode(statement);
         }
     }
     private void generateCodeFor(Statement statement) {
@@ -209,7 +207,7 @@ public class Writer {
             case PrintNode:{
                 PrintNode node = (PrintNode)statement;
                 String value = getString(node.getExpression());
-                System.out.println(value);
+                System.out.print(value);
                 break;
             }
 
@@ -234,10 +232,8 @@ public class Writer {
                 generateInit(init);
                 iterateBody(body);
 
-                
-
-            }
                 break;
+            }
             case WhileNode:{
                 WhileNode node = (WhileNode)statement;
                 Boolean cond = evaluateBoolean(node.getCondition());
@@ -377,8 +373,12 @@ public class Writer {
                 return String.valueOf(getValue(expression));
             case SPELL:
                 switch(expression.getExpressionType()){
-                    case StringLiteralNode:{
-                        return ((StringLiteralNode)expression).getValue();
+                    case StringLiteralNode: {
+                        String value = ((StringLiteralNode)expression).getValue();
+                        return value
+                            .replace("\\n", "\n")
+                            .replace("\\t", "\t")
+                            .replace("\\r", "\r");
                     }
                     case IdentifierNode:{
                         IdentifierNode node = (IdentifierNode)expression;
@@ -593,5 +593,17 @@ public class Writer {
                 throw new ArchMagi("Expression not supported yet: "
                         + expression.getExpressionType());
         }
+    }
+    private String analyzeFor(Statement init) {
+        return switch (init.getStatementType()) {
+            case IntCreateNode ->
+                ((IntCreateNode) init).getIdentifier();
+            case DoubleCreateNode ->
+                ((DoubleCreateNode) init).getIdentifier();
+            case BooleanCreateNode ->
+                ((BooleanCreateNode) init).getIdentifier();
+            default ->
+                throw new ArchMagi("Invalid for initialization");
+        };
     }
 }

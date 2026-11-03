@@ -1,0 +1,13 @@
+#Comments#
+# Second #
+
+Rune number = 21;
+Chant(number!=1){
+    Cast(number+" -> ");
+    Ward(number %2 ==0){
+        number = number/2;
+    }else{
+        number = number*3+1;
+    }
+}
+Cast(1+"\n");
