@@ -1,0 +1,24 @@
+Spell a="Fireball";
+Spell b="Magic missile";
+Spell c="Chain Lightning";
+Spell d= "Thunderbolt";
+Spell e="Ice knife";
+
+Barrage(Rune i=0;i<5;i++){
+    Ward(i==0){
+        Cast(a);
+    }
+    Ward(i==1){
+        Cast(b);
+    }
+    Ward(i==2){
+        Cast(c);
+    }
+    Ward(i==3){
+        Cast(d);
+    }
+    Ward(i==4){
+        Cast(e);
+    }
+    Cast("\n");
+}
